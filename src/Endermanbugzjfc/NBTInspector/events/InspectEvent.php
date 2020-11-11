@@ -23,17 +23,21 @@ namespace Endermanbugzjfc\NBTInspect\events;
 
 use pocketmine\{nbt\CompoundTag, utils\Utils};
 
+use Endermanbugzjfc\NBTInspect\NBTInspect as Main;
+
 class InspectEvent extends NBTInspectPluginEvent {
 
 	private $nbt;
 	private $onsave = null;
+	private $ui = Main::UI_DEFAULT;
 	
-	public function __construct(CompoundTag $nbt, ?callable $onsave) : void {
+	public function __construct(CompoundTag $nbt, ?callable $onsave, int $ui = Main::UI_DEFAULT) : void {
 		$this->setNBT($nbt);
 		if (isset($onsave)) {
 			Utils::validateCallableSignature(function(CompoundTag $nbt) {}, $onsave);
 			$this->onSave($onsave);
 		}
+		$this->ui = $ui;
 	}
 
 	public function getNBT() : CompoundTag {
@@ -52,6 +56,15 @@ class InspectEvent extends NBTInspectPluginEvent {
 
 	public function getOnSaveCallable() : ?callable {
 		return $this->onsave;
+	}
+
+	public function getUIType() : int {
+		return $this->ui;
+	}
+
+	public function setUIType(int $ui) : self {
+		$this->ui = $ui;
+		return $this;
 	}
 	
 }

@@ -34,6 +34,7 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	public const UI_FORM = 0;
 	public const UI_INVENTORY = 1;
 	public const UI_HOTBAR = 2;
+	public const UI_DEFAULT = self::UI_FORM;
 
 	public function onEnable() : void {
 		if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
