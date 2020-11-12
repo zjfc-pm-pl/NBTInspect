@@ -21,50 +21,33 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\events;
 
-use pocketmine\{nbt\CompoundTag, utils\Utils};
-
-use Endermanbugzjfc\NBTInspect\NBTInspect as Main;
+use pocketmine\{Player,nbt\NamedTag, utils\Utils};
 
 class InspectEvent extends NBTInspectPluginEvent {
 
 	private $nbt;
 	private $onsave = null;
-	private $ui = Main::UI_DEFAULT;
+	private $player;
 	
-	public function __construct(CompoundTag $nbt, ?callable $onsave, int $ui = Main::UI_DEFAULT) : void {
-		$this->setNBT($nbt);
+	public function __construct(Player $p, NamedTag $nbt, ?callable $onsave) : void {
+		$this->player = $p;
+		$this->nbt = $nbt;
 		if (isset($onsave)) {
-			Utils::validateCallableSignature(function(CompoundTag $nbt) {}, $onsave);
-			$this->onSave($onsave);
+			Utils::validateCallableSignature(function(NamedTag $nbt) {}, $onsave);
+			$this->onsave = $onsave;
 		}
-		$this->ui = $ui;
 	}
 
-	public function getNBT() : CompoundTag {
+	public function getNBT() : NamedTag {
 		return $this->nbt;
 	}
 
-	public function setNBT(CompoundTag $nbt) : self {
-		$this->nbt = $nbt;
-		return $this;
-	}
-
-	public function onSave(callable $onsave) : self {
-		$this->onsave = $onsave;
-		return $this;
-	}
-
-	public function getOnSaveCallable() : ?callable {
+	public function getOnSaveCallback() : ?callable {
 		return $this->onsave;
 	}
-
-	public function getUIType() : int {
-		return $this->ui;
-	}
-
-	public function setUIType(int $ui) : self {
-		$this->ui = $ui;
-		return $this;
+	
+	public function getPlayer() : Player {
+		return $this->player;
 	}
 	
 }

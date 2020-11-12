@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{nbt\CompoundTag, item\Item, entity\Entity};
+use pocketmine\{Player, nbt\CompoundTag, item\Item, entity\Entity};
 
 use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
@@ -61,6 +61,30 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	public function playerQuitEvent(\pocketmine\event\player\PlayerQuitEvent $p) : void {
 		unset($this->players[$p->getId()]);
 	}
+	
+	public function pluginEvent(events\NBTInspectPluginEvent $e) : void {
+		if ($e->isCancelled()) return;
+		switch (true) {
+			case $e instanceof events\InspectEvent:
+				switch ($this->getPlayerUsingUI($e->getPlayer())) {
+					case self::UI_INVENTORY:
+						break;
+						$class = viewers\InventoryTagViewer::class;
+					case self::UI_HOTBAR:
+						$class = viewers\HotbarTagViewer::class;
+						break;
+						
+					default:
+						$class = viewers\FormTagViewer::class;
+						break;
+				}
+				(new $class($e->getPlayer(), $e->getNBT(), $e->getOnSaveCallback())->open();
+				break;
+				
+				case events\DataSaveEvent:
+					break;
+		}
+	}
 
 	// API BELOW
 
@@ -68,16 +92,22 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 		return self::$instance;
 	}
 
-	public static function inspect(CompoundTag $nbt, ?callable $onsave) : events\InspectEvent {
-
+	public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : events\InspectEvent {
+		return (new events\InspectEvent($p, clone $nbt, $onsave)->call());
 	}
 
-	public static function inspectItem(Item $item) : events\InspectEvent {
-
+	public static function inspectItem(Player $p, Item $item) : events\InspectEvent {
+		return (new events\InspectEvent($p, clone $item->getNamedTag(), function(NamedTag $nbt) use ($item) : void {
+			if (!($item ?? null) instanceof Item) return;
+			$item->setNamedTag($nbt);
+		}))->call();
 	}
 
-	public static function inspectEntity(Entity $entity) : events\InspectEvent {
-
+	public static function inspectEntity(Player $p, Entity $entity) : events\InspectEvent {
+		return (new events\InspectEvent($p, clone $entity->namedtag, function(NamedTag $nbt) use ($entity) : void {
+			if (!($entity ?? null) instanceof Entity) return;
+			$entity->namedtag = $nbt;
+		}))->call();
 	}
 
 	public function getPlayerUsingUI(Player $player) : int {
