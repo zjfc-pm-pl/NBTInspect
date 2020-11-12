@@ -78,10 +78,10 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 						$class = viewers\FormTagViewer::class;
 						break;
 				}
-				(new $class($e->getPlayer(), $e->getNBT(), $e->getOnSaveCallback())->open();
+				(new $class($e->getPlayer(), $e->getNBT(), $e->getOnSaveCallback()))->open();
 				break;
 				
-				case events\DataSaveEvent:
+				case $e instanceof events\DataSaveEvent:
 					break;
 		}
 	}
