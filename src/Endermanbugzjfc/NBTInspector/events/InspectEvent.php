@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\events;
 
-use pocketmine\{Player,nbt\NamedTag, utils\Utils};
+use pocketmine\{Player,nbt\tag\NamedTag, utils\Utils};
 
 class InspectEvent extends NBTInspectPluginEvent {
 

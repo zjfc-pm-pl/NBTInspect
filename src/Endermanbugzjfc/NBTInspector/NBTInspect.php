@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{Player, nbt\CompoundTag, item\Item, entity\Entity};
+use pocketmine\{Player, nbt\tag\CompoundTag, item\Item, entity\Entity};
 
 use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
