@@ -2,5 +2,5 @@ name: NBTInspect
 author: Endermanbugzjfc
 api: 3.11.2 # InvMenu v3 minium api version
 version: 1.0.0
-main: Endermanbugzjfc\NBTInspector\NBTInspector
+main: Endermanbugzjfc\NBTInspect\NBTInspect
 description: A in-game NBT editing / debugging tool!
