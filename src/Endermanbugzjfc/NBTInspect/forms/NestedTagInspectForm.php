@@ -33,8 +33,8 @@ class NestedTagInspectForm extends BaseForm {
 		$s = $this->getSession();
 		$f->setTitle(TF::DARK_AQUA . ($t = $s->getOpenedTags()[0])->getName() . TF::BOLD . '(' . (string)Utils::shortenTagType($t) . TF::RESET . TF::BOLD . TF::DARK_AQUA . ')');
 		$f->setContent(TF::YELLOW . 'Inspecting in: ' . TF::AQUA . implode(TF::RESET TF::BLUE . ' >> ' . TF::AQUA, array_map(function(NamedTag $tag) : string {
-			return $tag->getName() . TF::BOLD . '('
-		}, $s->getOpenedTags(true))));
+			return $tag->getName() . TF::BOLD . '(' . Utils::shortenTagType() . $tag . TF::AQUA . ')';
+		}, $s->getOpenedTags(true))) . "\n" . TF::RESET . TF::YELLOW . 'Tags: ' . TF::AQUA . $tag->getCount() . ' of ' . (Utils::printTagType($tag) ?? TF::BLACK . 'Mixed') . TF::AQUA . ' type');
 	}
 	
 	protected function react();

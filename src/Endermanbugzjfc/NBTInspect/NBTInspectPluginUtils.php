@@ -26,6 +26,62 @@ use pocketmine\utils\TextFormat as TF;
 
 class NBTInspectPluginUtils {
 
+	public static function printTagType(NamedTag $tag, bool $color = true) : ?string {
+	
+		switch ($tag->getType()) {
+		
+			case NBT::TAG_End:
+				return ($color ? TF::GRAY : '') . 'End';
+				break;
+				
+			case NBT::TAG_Byte:
+				return ($color ? TF::DARK_RED : '') . 'Byte';
+				break;
+				
+			case NBT::TAG_Short:
+				return ($color ? TF::DARK_PURPLE : '') . 'Short';
+				break;
+				
+			case NBT::TAG_Int:
+				return ($color ? TF::DARK_BLUE : '') . 'Int';
+				break;
+				
+			case NBT::TAG_Long:
+				return ($color ? TF::DARK_AQUA : '') . 'Long';
+				break;
+				
+			case NBT::TAG_Float:
+				return ($color ? TF::YELLOW : '') . 'Float';
+				break;
+				
+			case NBT::TAG_Double:
+				return ($color ? TF::DARK_GREEN : '') . 'Double';
+				break;
+				
+			case NBT::TAG_Byte_Array:
+				return ($color ? TF::DARK_RED : '') . 'Byte Array';
+				break;
+				
+			case NBT::TAG_String:
+				return ($color ? TF::DARK_GRAY : '') . 'String';
+				break;
+		
+			case NBT::TAG_List:
+				return ($color ? TF::GOLD : '') . 'List';
+				break;
+				
+			case NBT::TAG_Compound:
+				return ($color ? TF::BLACK : '') . 'Compound';
+				break;
+				
+			case NBT::TAG_IntArray:
+				return ($color ? TF::DARK_BLUE : '') . 'Int Array';
+				break;
+		
+		}
+		return null;
+	
+
 	public static function shortenTagType(NamedTag $tag, bool $color = true) : ?string {
 	
 		switch ($tag->getType()) {
@@ -63,7 +119,7 @@ class NBTInspectPluginUtils {
 				break;
 				
 			case NBT::TAG_String:
-				return ($color ? TF::DARK_GRAY : '') . 'S';
+				return ($color ? TF::DARK_GRAY : '') . 'ST';
 				break;
 		
 			case NBT::TAG_List:
