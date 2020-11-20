@@ -26,13 +26,12 @@ use pocketmine\{Player, nbt\tag\NamedTag, item\Item, entity\Entity};
 use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
 final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketmine\event\Listener {
+	use API;
 
-	private $players = [];
+	protected $players = [];
+	protected $uis = [];
 
 	private static $instance = null;
-
-	public const UI_FORM = 0;
-	public const UI_INVENTORY = 1;
 
 	public function onEnable() : void {
 		self::$instance = $this;
@@ -44,18 +43,7 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 		unset($this->players[$p->getId()]);
 	}
 
-	// API BELOW
-
 	public static function getInstance() : ?self {
 		return self::$instance;
-	}
-
-	public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : sessions\InspectSession {
-	}
-
-	public static function inspectItem(Player $p, Item $item) : sessions\InspectSession {
-	}
-
-	public static function inspectEntity(Player $p, Entity $entity) : sessions\InspectSession {
 	}
 }

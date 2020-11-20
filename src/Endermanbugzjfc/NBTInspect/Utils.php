@@ -24,7 +24,7 @@ namespace Endermanbugzjfc\NBTInspect;
 use pocketmine\nbt\{NBT, tag\NamedTag};
 use pocketmine\utils\TextFormat as TF;
 
-class NBTInspectPluginUtils {
+class Utils {
 
 	public static function printTagType(NamedTag $tag, bool $color = true) : ?string {
 	

@@ -19,7 +19,9 @@
 */
 
 declare(strict_types=1);
-namespace Endermanbugzjfc\NBTInspect\forms;
+namespace Endermanbugzjfc\NBTInspect\uis\defaults\forms;
+
+use pocketmine\utils\TextFormat as TF;
 
 use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm, ModalForm};
 
@@ -37,7 +39,7 @@ abstract class BaseForm {
 
 	public function __construct(InspectSession $s) {
 		$this->session = $s;
-		$this->form = new self::TYPE([$this, 'preReact']);
+		$this->form = new (self::TYPE)([$this, 'preReact']);
 		$s->getPlayer()->sendForm($this->form());
 	}
 	
@@ -49,7 +51,7 @@ abstract class BaseForm {
 		$this->react($react);
 	}
 	
-	abstract protected function react(?$data) : void;
+	abstract protected function react($data = null) : void;
 	abstract protected function form() : Form;
 	
 	public function getSession() : InspectSession {
@@ -58,6 +60,12 @@ abstract class BaseForm {
 	
 	public function getPlugin() : ?NBTInspect {
 		return NBTInspect::getInstance();
+	}
+
+	protected function addSwitchUIButton() : bool {
+		if (!$this->getForm() instanceof SimpleForm) return false;
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_BLUE . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To inventory UI');
+		return true;
 	}
 
 }
