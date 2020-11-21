@@ -46,4 +46,30 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	public static function getInstance() : ?self {
 		return self::$instance;
 	}
+
+	public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : sessions\InspectSession {
+	}
+
+	public static function inspectItem(Player $p, Item $item) : sessions\InspectSession {
+	}
+
+	public static function inspectEntity(Player $p, Entity $entity) : sessions\InspectSession {
+	}
+
+	public function switchPlayerUsingUI(Player $p, uis\UIInterface $ui) : void {
+		$this->players[$p->getId()] = $ui;
+	}
+
+	public function getPlayerUsingUI(Player $p) : uis\UIInterface {
+		return $this->players[$p->getId()] ?? uis\defaults\DefaultFormUI::getInstance();
+	}
+
+	public function registerInspectUI(uis\UIInterface $ui) : void {
+		foreach ($this->uis as $ui) if ($ui->getName() === $ui->getName()) throw new \InvalidArgumentException('Theres is already an UI having the same name!');
+		$this->uis[] = $ui;
+	}
+
+	public function getAllUI() : array {
+		return $this->uis;
+	}
 }
