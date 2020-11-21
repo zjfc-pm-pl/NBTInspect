@@ -4,3 +4,6 @@ api: 3.11.2 # InvMenu v3 minium api version
 version: 1.0.0
 main: Endermanbugzjfc\NBTInspect\NBTInspect
 description: A in-game NBT editing / debugging tool!
+# Let people where this plugin is from if they download from some random weird place
+# (For example YouTube)
+website: https://github.com/Endermanbugzjfc/NBTInspect/
