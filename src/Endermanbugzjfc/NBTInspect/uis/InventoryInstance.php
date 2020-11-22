@@ -21,12 +21,13 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\{Player, nbt\tag\NamedTag};
+use pocketmine\Player;
+use pocketmine\nbt\tag\{NamedTag};
 
-interface UIInterface {
+class InventoryInstance {
 	
-	public function getName() : string;
-	public function getInstance() : self;
-	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $switch_from);
+	public function __construct(Player $p, NamedTag $tag, ?callable $onsave) {
+		
+	}
 	
 }

@@ -19,14 +19,19 @@
 */
 
 declare(strict_types=1);
-namespace Endermanbugzjfc\NBTInspect\uis;
+namespace Endermanbugzjfc\NBTInspect;
 
 use pocketmine\{Player, nbt\tag\NamedTag};
 
-interface UIInterface {
+class InventoryUI implements UIInterface {
+	use \kim\present\traits\singleton\SingletonTrait;
 	
-	public function getName() : string;
-	public function getInstance() : self;
-	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $switch_from);
-	
+	public function getName() : string {
+		return 'Inventory';
+	}
+
+	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) {
+		(new InventoryInstance($p, $tag, $onsave));
+	}
+
 }
