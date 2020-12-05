@@ -23,17 +23,24 @@ namespace Endermanbugzjfc\NBTInspect\uis\defaults\forms;
 
 use pocketmine\utils\TextFormat as TF;
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect as Main, Utils};
+use Endermanbugzjfc\NBTInspect\{NBTInspect as Main, Utils, forms\UIInterface, forms\FormUI};
 
 use function implode;
 use function array_map;
 use function is_null;
+use function array_search;
 
 class NestedTagInspectForm extends BaseForm {
 
 	protected const TYPE = self::SIMPLE;
 
 	private $tpointer = [];
+	private $from;
+
+	public function __construct(InspectSession $s, ?UIInterface $from) {
+		parent::__construct($s);
+		$this->from = $from;
+	}
 
 	protected function form() : \jojoe77777\FormAPI\Form {
 		$f = $this->getForm();
@@ -47,7 +54,10 @@ class NestedTagInspectForm extends BaseForm {
 
 		foreach ($t->getValue() as $st) $this->addTagToMenu($st);
 
-		$this->addSwitchUIButton();
+		if (isset($this->from)) {
+			if (($r = array_search($this->from, $ui = Main::getInstance()->getAllUI())) !== false) unset($ui[$r]);
+			$this->addSwitchUIButton($ui[$r + 1] ?? ($ui[0] ?? FormUI::class));
+		}
 
 		return $f;
 	}
@@ -55,10 +65,12 @@ class NestedTagInspectForm extends BaseForm {
 	protected function addTagToMenu(NamedTag $t) {
 		$this->tagpointer[] = $t;
 		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $t->getName() . "\n" . TF::RESET . Utils::printTagType($t) . ' Tag');
+
+		return $this;
 	}
 
 	protected function getTagsPointer() : array {
-		return $this->tagpointer;
+		return $this->tpointer;
 	}
 	
 	protected function react($data = null) : void {
@@ -69,6 +81,12 @@ class NestedTagInspectForm extends BaseForm {
 			return;
 		}
 		$s->openTag($t);
+	}
+
+	private function addSwitchUIButton(string $ui) {
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_BLUE . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
+
+		return $this;
 	}
 
 }

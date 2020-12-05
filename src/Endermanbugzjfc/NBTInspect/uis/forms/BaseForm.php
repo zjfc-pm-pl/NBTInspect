@@ -39,14 +39,11 @@ abstract class BaseForm {
 
 	public function __construct(InspectSession $s) {
 		$this->session = $s;
-		$this->form = new (self::TYPE)([$this, 'preReact']);
+		$type = self::TYPE;
+		$this->form = new $type([$this, 'preReact']);
 		$s->getPlayer()->sendForm($this->form());
 	}
-	
-	public function preReact(\pocketmine\Player $p, $data = null) : void {
-		$this->react($react);
-	}
-	
+
 	public function preReact(\pocketmine\Player $p, $data = null) : void {
 		$this->react($react);
 	}
@@ -60,12 +57,6 @@ abstract class BaseForm {
 	
 	public function getPlugin() : ?NBTInspect {
 		return NBTInspect::getInstance();
-	}
-
-	protected function addSwitchUIButton() : bool {
-		if (!$this->getForm() instanceof SimpleForm) return false;
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_BLUE . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To inventory UI');
-		return true;
 	}
 
 }

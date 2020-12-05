@@ -24,13 +24,23 @@ namespace Endermanbugzjfc\NBTInspect;
 use pocketmine\{Player, nbt\tag\NamedTag};
 
 class InventoryUI implements UIInterface {
+
+	private $inv;
+	private $player;
+	private $tag;
+	private $onsave = null;
+	private $from = null;
 	
 	public static function getName() : string {
 		return 'Inventory';
 	}
 
-	public static function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) {
-		(new InventoryInstance($p, $tag, $onsave));
+	public static function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) : self {
+		return new self($p, $tag, $onsave, $from);
+	}
+
+	public function __construct(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) {
+		()
 	}
 
 }

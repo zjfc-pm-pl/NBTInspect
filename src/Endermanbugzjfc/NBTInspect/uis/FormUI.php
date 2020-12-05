@@ -21,8 +21,6 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\utils\Utils;
-
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
 class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
@@ -31,15 +29,16 @@ class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
 		return 'Form';
 	}
 
-	public static function open(NamedTag $tag, ?callable $onsave, \Endermanbugzjfc\NBTInspect\uis\UIInterface $from) {
-		$tag = $tag->getOpenedTags()[0];
-		
+	public static function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) : self {
+		self::openTagByType($p, $tag, $from);
+		return new self;
 	}
 
-	protected function openTagByType(NamedTag $tag) {
+	protected static function openTagByType(Player $p, NamedTag $tag, ?UIInterface $from) : bool {
 		switch (true) {
 			case $tag instanceof CompoundTag:
-				$tag->getPlayer()->sendForm((new forms\NestedTagInspectForm($tag))->form());
+				$p->sendForm((new forms\NestedTagInspectForm($tag, $from))->form());
+				return true;
 				break;
 
 			case $tag instanceof ByteTag:
@@ -50,11 +49,12 @@ class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
 			case $tag instanceof DoubleTag:
 			case $tag instanceof ByteArrayTag:
 			case $tag instanceof IntArrayTag:
-				$tag->getPlayer()->sendForm((new forms\ValueEditForm($tag))->form());
+				$p->sendForm((new forms\ValueEditForm($tag, $from))->form());
+				return true;
 				break;
 
 			default:
-				if (isset($tag->getOpenedTags()[1])) $this->openTagByType($tag->getOpenedTags()[1]);
+				return false;
 				break;
 		}
 	}

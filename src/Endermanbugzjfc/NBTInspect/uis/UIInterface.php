@@ -26,7 +26,6 @@ use pocketmine\{Player, nbt\tag\NamedTag};
 interface UIInterface {
 	
 	public function getName() : string;
-	public function getInstance() : self;
-	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $switch_from);
+	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $switch_from) : self;
 	
 }
