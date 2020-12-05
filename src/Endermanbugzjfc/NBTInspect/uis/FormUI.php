@@ -26,7 +26,6 @@ use pocketmine\utils\Utils;
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
 class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
-	use \kim\present\traits\singleton\SingletonTrait;
 	
 	public static function getName() : string {
 		return 'Form';

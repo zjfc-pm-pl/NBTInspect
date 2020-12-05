@@ -25,6 +25,8 @@ use pocketmine\{Player, nbt\tag\NamedTag, item\Item, entity\Entity};
 
 use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
+use function is_a;
+
 final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketmine\event\Listener {
 	use API;
 
@@ -86,11 +88,13 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	}
 
 	public function registerUI(uis\UIInterface $ui) : void {
-		foreach ($this->uis as $ui) if ($ui->getName() === $ui->getName()) throw new \InvalidArgumentException('Theres is already an UI having the same name!');
+		if (!is_a($ui, uis\UIInterface::class, true)) throw new \InvalidArgumentException('Argument 1 must be a namespace of a class that implements UIInterface');
+		foreach ($this->uis as $rui) if ($ui::getName() === $rui::getName()) throw new \InvalidArgumentException('Theres is already an registered UI having the same name!');
 		$this->uis[] = $ui;
 	}
 
 	public function unregisterUI(uis\UIInterface $ui) : bool {
+		if (!is_a($ui, uis\UIInterface::class, true)) throw new \InvalidArgumentException('Argument 1 must be a namespace of a class that implements UIInterface');
 		foreach ($this->uis as $i => $rui) if ($rui === $ui) {
 			unset($this->uis[$i]);
 			return true;

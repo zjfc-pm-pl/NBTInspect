@@ -32,11 +32,14 @@ trait API {
 	abstract public static function inspectItem(Player $p, Item $item) : ?sessions\InspectSession;
 	abstract public static function inspectEntity(Player $p, Entity $entity) : ?sessions\InspectSession;
 
-	abstract public function switchPlayerUI(Player $p, uis\UIInterface) : events\PlayerSwitchUIEvent;
+	abstract public function switchPlayerUI(Player $p, uis\UIInterface $ui) : events\PlayerSwitchUIEvent;
 	abstract public function getPlayerUI(Player $p) : uis\UIInterface;
 
-	abstract public function registerUI(uis\UIInterface $ui) : void;
-	abstract public function unregisterUI(uis\UIInterface $ui) : bool;
+	/*
+		Please input the namespace of a class that implements UIInterface
+	*/
+	abstract public function registerUI(string $ui) : void;
+	abstract public function unregisterUI(string $ui) : bool;
 	/*
 		Get all registered UIs (Including the default UIs)
 	*/
