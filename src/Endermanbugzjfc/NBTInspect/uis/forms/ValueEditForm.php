@@ -22,11 +22,11 @@ declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\defaults\forms;
 
 use pocketmine\utils\TextFormat as TF;
-use pocketmine\nbt\tag\{ByteArrayTag, IntArrayTag};
+use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
 use Endermanbugzjfc\NBTInspect\{NBTInspect as Main, Utils};
 
-class NestedTagInspectForm extends BaseForm {
+abstract class NestedTagInspectForm extends BaseForm {
 
 	protected const TYPE = self::CUSTOM;
 	
@@ -40,35 +40,9 @@ class NestedTagInspectForm extends BaseForm {
 			return $t->getName() . TF::BOLD . '(' . Utils::shortenTagType() . $t . TF::AQUA . ')';
 		}, $s->getOpenedTags(true))));
 
-		switch (true) {
-			case $t instanceof StringTag:
-				$vt = 'String';
-				break;
-			
-			default:
-				$vt = 'Int';
-				break;
-		}
-
-		if (!(($t instanceof ByteTag) or ($t instanceof IntArrayTag))) {
-			$f->addInput(TF::BOLD . TF::GOLD . 'Edit value: (' . $vt . ')');
-		}
-
-		foreach ($t->getValue() as $st) $this->addTagToMenu($st);
-
-		$this->addSwitchUIButton();
-
 		return $f;
 	}
 
-	protected function react($data = null) : void {
-		if (is_null($data)) return;
-		if (is_null($t = $this->getTagsPointer()[(int)$data] ?? null)) {
-			Main::getInstance()->switchPlayerUsingUI($this->getSession()->getPlayer(), Main::UI_INVENTORY);
-			$this->getSession()->openInspectUI();
-			return;
-		}
-		$s->openTag($t);
-	}
+	abstract protected function react($data = null) : void;
 	
 }

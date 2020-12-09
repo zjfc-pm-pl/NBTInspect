@@ -21,7 +21,8 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\nbt\{NBT, tag\NamedTag};
+use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 use pocketmine\utils\TextFormat as TF;
 
 class Utils {
@@ -136,6 +137,10 @@ class Utils {
 		
 		}
 		return null;
+	}
+
+	public static function isArrayTag(NamedTag $tag) : bool {
+		return ($t instanceof ByteArrayTag) or ($t instanceof IntArrayTag);
 	}
 
 }
