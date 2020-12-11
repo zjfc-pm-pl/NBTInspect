@@ -30,7 +30,7 @@ use function is_a;
 final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketmine\event\Listener {
 	use API;
 
-	public const UI_DEFAULT = uis\InventoryUI::class;
+	public const UI_DEFAULT = uis\FormUI::class;
 
 	protected $players = [];
 	protected $uis = [];
@@ -80,11 +80,12 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	}
 
 	public function switchPlayerUI(Player $p, uis\UIInterface $ui) : events\PlayerSwitchUIEvent {
-		($ev = new events\PlayerSwitchUIEvent($p, $ui))->call();
+		$this->players[$p->getId()] = $ui;
+		return $this;
 	}
 
 	public function getPlayerUI(Player $p) : uis\UIInterface {
-		return $this->players[$p->getId()] ?? self::UI_DEFAULT::getClass();
+		return $this->players[$p->getId()] ?? self::UI_DEFAULT;
 	}
 
 	public function registerUI(uis\UIInterface $ui) : void {

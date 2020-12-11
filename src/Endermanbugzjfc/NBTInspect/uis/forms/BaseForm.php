@@ -19,13 +19,13 @@
 */
 
 declare(strict_types=1);
-namespace Endermanbugzjfc\NBTInspect\uis\defaults\forms;
+namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
 use pocketmine\utils\TextFormat as TF;
 
 use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm, ModalForm};
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect, sessions\InspectSession};
+use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface};
 
 abstract class BaseForm {
 
@@ -34,29 +34,32 @@ abstract class BaseForm {
 	protected const MODAL = ModalForm::class;
 
 	protected const TYPE = null;
-	private $session;
+
+	private $ui;
 	private $form;
 
-	public function __construct(InspectSession $s) {
-		$this->session = $s;
-		$type = self::TYPE;
-		$this->form = new $type([$this, 'preReact']);
-		$s->getPlayer()->sendForm($this->form());
+	public function __construct(UIInterface $ui) {
+		$this->ui = $ui;
+		$this->resetForm();
+		$ui->getSession()->getPlayer()->sendForm($this->form());
 	}
 
 	public function preReact(\pocketmine\Player $p, $data = null) : void {
+		$this->resetForm();
 		$this->react($react);
 	}
 	
 	abstract protected function react($data = null) : void;
 	abstract protected function form() : Form;
 	
-	public function getSession() : InspectSession {
-		return $this->session;
+	public function getUIInstance() : UIInterface {
+		return $this->ui;
 	}
-	
-	public function getPlugin() : ?NBTInspect {
-		return NBTInspect::getInstance();
+
+	protected function resetForm() {
+		$type = self::TYPE;
+		$this->form = new $type([$this, 'preReact']);
+		return $this;
 	}
 
 }

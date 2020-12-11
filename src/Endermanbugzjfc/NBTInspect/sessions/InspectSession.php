@@ -38,10 +38,9 @@ class InspectSession {
 	private $onsave = null;
 	private $ui;
 	
-	public function __construct(Player $player, ?NamedTag $tag, ?callable $onsave) {
+	public function __construct(Player $player, NamedTag $tag = null, callable $onsave = null) {
 		$this->player = $player;
-		if (isset($onsave)) Utils::validateCallableSignaure(function(NamedTag $edited) {}, $onsave);
-		$this->onsave = $onsave;
+		if (isset($onsave)) $this->setOnSaveCallback($onsave);
 		if (isset($tag)) $this->replaceRootTag($tag);
 	}
 
@@ -50,7 +49,7 @@ class InspectSession {
 	}
 
 	public function getRootTag() : ?NamedTag {
-		return array_reverse($this->tag)[0] ?? null;
+		return $this->getAllOpenedTags(true)[0] ?? null;
 	}
 
 	public function replaceRootTag(NamedTag $tag) {
@@ -64,7 +63,8 @@ class InspectSession {
 		return $this->tag[0];
 	}
 
-	public function getAllOpenedTags() : array {
+	public function getAllOpenedTags(bool $reverse = false) : array {
+		if ($reverse) return array_reverse($this->tag);
 		return $this->tag;
 	}
 
@@ -81,13 +81,13 @@ class InspectSession {
 	}
 
 	public function getUIInstance() : UIInterface {
-		if (!isset($this->ui)) $this->switchUI(NBTInspect::getPlayerUI($this->getPlayer())::create($this));
+		if (!isset($this->ui)) $this->switchUI();
 		return $this->ui;
 	}
 
-	public function switchUI(UIInterface $ui) {
+	public function switchUI() {
 		if (isset($this->ui)) $this->ui->close();
-		$this->ui = $ui;
+		$this->ui = NBTInspect::getPlayerUI($this->getPlayer())::create($this);
 
 		return $this;
 	}
@@ -109,6 +109,13 @@ class InspectSession {
 	
 	public function getOnSaveCallback() : ?callable {
 		return $this->onsave;
+	}
+
+	public function setOnSaveCallback(callable $onsave) {
+		Utils::validateCallableSignaure(function(NamedTag $edited) {}, $onsave);
+		$this->onsave = $onsave;
+
+		return $this;
 	}
 
 }

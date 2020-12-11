@@ -28,11 +28,14 @@ use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 interface UIInterface {
 	
 	public function getName() : string;
-	public static function create(InspectSession $session) : self;
+	public static function create(InspectSession $session, UIInterface $previous = null) : self;
 
 	public function preInsepct();
 	public function insepct();
+	public function close();
 
 	public function getSession() : InspectSession;
+
+	public function getPreviousUI() : ?UIInterface;
 
 }

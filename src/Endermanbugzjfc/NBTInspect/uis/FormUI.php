@@ -21,24 +21,54 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
+use pocketmine\utils\TextFormat as TF;
+use pocketmine\scheduler\{ClosureTask, TaskHandler};
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
-class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
+use Endermanbugzjfc\NBTInspect\{NBTInspect, sessions\InspectSession, uis\UIInterface};
+
+class FormUI implements UIInterface {
+
+	private $session;
+	protected $preinspect = null;
+	protected $previous = null;
+
+	protected function __construct(InspectSession $session) {
+		$this->session = $session;
+	}
 	
 	public static function getName() : string {
 		return 'Form';
 	}
 
-	public static function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $from) : self {
-		self::openTagByType($p, $tag, $from);
-		return new self;
+	public static function create(InspectSession $session, UIInterface $previous = null) : self {
+		$self = new self($session);
+		$self->previous = $previous;
+		return $self;
 	}
 
-	protected static function openTagByType(Player $p, NamedTag $tag, ?UIInterface $from) : bool {
+	public function getSession() : InspectSession {
+		return $this->session;
+	}
+
+	public function preInspect() {
+		$this->preinspect = NBTInspect::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $ct) : void {
+			$this->getSession()->getPlayer()->sendPopup(TF::YELLOW . 'Loading NBT tag to inspect...');
+		}), 40);
+
+		return $this;
+	}
+
+	public function inspect() {
+		if ($this->preinspect instanceof TaskHandler) $this->preinspect->cancel();
 		switch (true) {
 			case $tag instanceof CompoundTag:
-				$p->sendForm((new forms\NestedTagInspectForm($tag, $from))->form());
-				return true;
+			case $tag instanceof ListTag:
+				return new forms\NestedTagInspectForm($this);
+				break;
+
+			case $tag instanceof StringTag:
+				return new forms\StringValueEditForm($this);
 				break;
 
 			case $tag instanceof ByteTag:
@@ -47,16 +77,25 @@ class FormUI implements \Endermanbugzjfc\NBTInspect\uis\UIInterface {
 			case $tag instanceof LongTag:
 			case $tag instanceof FloatTag:
 			case $tag instanceof DoubleTag:
+				return new forms\NumbermicValueEditForm($this);
+				break;
+
 			case $tag instanceof ByteArrayTag:
 			case $tag instanceof IntArrayTag:
-				$p->sendForm((new forms\ValueEditForm($tag, $from))->form());
-				return true;
+				return new forms\BatchNumbermicValueEditForm($this);
 				break;
 
 			default:
-				return false;
+				throw new \RuntimeException('An invalid tag type has given');
 				break;
 		}
+		return $this;
+	}
+
+	public function close() {return $this;}
+
+	public function getPreviousUI() : ?UIInterface {
+		return $this->previous;
 	}
 	
 }
