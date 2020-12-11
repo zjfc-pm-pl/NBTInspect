@@ -23,9 +23,16 @@ namespace Endermanbugzjfc\NBTInspect\uis;
 
 use pocketmine\{Player, nbt\tag\NamedTag};
 
+use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
+
 interface UIInterface {
 	
 	public function getName() : string;
-	public function open(Player $p, NamedTag $tag, ?callable $onsave, ?UIInterface $switch_from) : self;
-	
+	public static function create(InspectSession $session) : self;
+
+	public function preInsepct();
+	public function insepct();
+
+	public function getSession() : InspectSession;
+
 }
