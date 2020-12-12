@@ -37,6 +37,7 @@ class InspectSession {
 	private $tag = [];
 	private $onsave = null;
 	private $ui;
+	private $origin = null;
 	
 	public function __construct(Player $player, NamedTag $tag = null, callable $onsave = null) {
 		$this->player = $player;
@@ -52,9 +53,27 @@ class InspectSession {
 		return $this->getAllOpenedTags(true)[0] ?? null;
 	}
 
+	protected function getOriginRootTag() : ?NamedTag {
+		return $this->origin;
+	}
+
 	public function replaceRootTag(NamedTag $tag) {
 		if (count($this->tag) > 1) throw new \InvalidStateException('Please close all the child tags before changing the root tag');
+		$this->origin = clone $tag;
 		$this->tag = [clone $tag];
+
+		return $this;
+	}
+
+	public function discardChanges() {
+		assert($this->getRootTag() instanceof NamedTag);
+		$this->tag = [$this->getOriginRootTag()];
+
+		return $this;
+	}
+
+	public function saveChanges() {
+		$this->getOnSaveCallable()($this->getRootTag());
 
 		return $this;
 	}
