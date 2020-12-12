@@ -21,18 +21,21 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
-use function str_split;
+use pocketmine\utils\TextFormat as TF;
+use pocketmine\nbt\tag\{FloatTag, DoubleTag};
+
+use Endermanbugzjfc\NBTInspect\Utils;
+
 use function is_null;
 use function array_shift;
-use function implode;
 
-class StringValueEditForm extends ValueEditForm {
+class NumbericValueEditForm extends ValueEditForm {
 	
 	protected function form() : \jojoe77777\FormAPI\Form {
 		$f = parent::form();
 		$s = $this->getUIInstance()->getSession();
-		$t = str_split($s->getCurrentTag()->getValue(), 75);
-		foreach ($t as $v) $f->addInput('', '', $v);
+		$t = $this->getUIInstance()->getSession()->getCurrentTag();
+		$f->addLabel(TF::YELLOW . 'Acceptable value range: ' . TF::BOLD . TF::GOLD . (Utils::getNumbericTagAcceptableValueRange($t) ?? TF::RED . 'UNKNOWN'));
 		return $f;
 	}
 
@@ -45,8 +48,18 @@ class StringValueEditForm extends ValueEditForm {
 			return;
 		}
 		array_shift($data);
-		$data = implode('', $data);
-		$s->getCurrentTag()->setValue($data);
+		array_shift($data);
+		$t = $s->getCurrentTag();
+		switch (true) {
+			case $t instanceof FloatTag:
+			case $t instanceof DoubleTag:
+				$t->setValue((float)$tag);
+				break;
+			
+			default:
+				$t->setValue((int)$tag);
+				break;
+		}
 		if ($s->getRootTag() === $s->getCurrentTag()) {
 			$f = new ApplyConfirmationForm($this->getUIInstance());
 			$s->getPlayer()->sendForm($f->form());

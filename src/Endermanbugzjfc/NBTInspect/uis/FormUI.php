@@ -77,12 +77,12 @@ class FormUI implements UIInterface {
 			case $tag instanceof LongTag:
 			case $tag instanceof FloatTag:
 			case $tag instanceof DoubleTag:
-				return new forms\NumbermicValueEditForm($this);
+				return new forms\NumbericValueEditForm($this);
 				break;
 
 			case $tag instanceof ByteArrayTag:
 			case $tag instanceof IntArrayTag:
-				return new forms\BatchNumbermicValueEditForm($this);
+				return new forms\BatchNumbericValueEditForm($this);
 				break;
 
 			default:

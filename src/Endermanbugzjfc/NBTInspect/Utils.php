@@ -143,4 +143,36 @@ class Utils {
 		return ($t instanceof ByteArrayTag) or ($t instanceof IntArrayTag);
 	}
 
+	public static function getNumbericTagAcceptableValueRange(NamedTag $tag) : ?string {
+		switch ($tag->getType()) {
+				
+			case NBT::TAG_Byte:
+			case NBT::TAG_Byte_Array:
+				return 'Int (-128 ~ 127)';
+				break;
+				
+			case NBT::TAG_Short:
+				return 'Int (-32768 ~ 32767)';
+				break;
+				
+			case NBT::TAG_Int:
+			case NBT::TAG_IntArray:
+				return 'Int (-2147483648 ~ 2147483647)';
+				break;
+				
+			case NBT::TAG_Long:
+				return 'Int (-9223372036854775808[-2ˆ63] ~ 9.2233720368548E+18[2ˆ63-1])';
+				break;
+				
+			case NBT::TAG_Float:
+				return 'Float (Binary32 Single Precision)';
+				break;
+				
+			case NBT::TAG_Double:
+				return 'Float (Binary64 Double Precision)';
+				break;
+				
+		}
+	}
+
 }
