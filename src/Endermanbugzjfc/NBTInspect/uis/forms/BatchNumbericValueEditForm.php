@@ -45,11 +45,16 @@ class BatchNumbericValueEditForm extends ValueEditForm {
 			if ((($this->getPage() + 1) * 10) > $k) continue;
 			$f->addInput('', 'Unset', (string)$v, (string)$en++);
 		}
-		$f->addInput(TF::AQUA . "Go to page\n" . TF::BLUE . ' - ' . TF::DARK_AQUA . implode("\n" . TF::RESET . TF::BLUE . ' - ' . TF::DARK_AQUA, [
+		if ($s->getRootTag() === $s->getCurrentTag()) $ia = [
+			'-1 = ' . TF::GREEN . 'Done',
+			'-2 = ' . TF::GOLD . 'Insert new value at this page'
+		]
+		else $ia = [
 			'-1 = ' . TF::GREEN . 'Done',
 			'-2 = ' . TF::GOLD . 'Insert new value at this page',
 			'-3 = ' . TF::RED . 'Delete tag'
-		]), $this->getPage() + 1 . ' / ' . ceil(count($t->getValue()) / 10), 'page');
+		];
+		$f->addInput(TF::AQUA . "Go to page\n" . TF::BLUE . ' - ' . TF::DARK_AQUA . implode("\n" . TF::RESET . TF::BLUE . ' - ' . TF::DARK_AQUA, $ia), $this->getPage() + 1 . ' / ' . ceil(count($t->getValue()) / 10), 'page');
 		return $f;
 	}
 
@@ -95,12 +100,17 @@ class BatchNumbericValueEditForm extends ValueEditForm {
 				break;
 
 			case -3:
+				if ($s->getRootTag() === $s->getCurrentTag()) {
+					$this->setPage($page);
+					$s->getPlayer()->sendForm($this->form());
+				}
 				$s->deleteCurrentTag();
 				$s->inspectCurrentTag();
 				break;
 
 			default:
 				$this->setPage($page);
+				$s->getPlayer()->sendForm($this->form());
 				break;
 		}
 	}

@@ -57,16 +57,19 @@ class NestedTagInspectForm extends BaseForm {
 			$ui = $uis[array_rand($uis)];
 		} else $ui = InventoryUI::class;
 		$this->switchui = $ui;
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_BLUE . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
-
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
+		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . "Delete\nThis Tag");
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_GRREEN . "Insert\nNew Tag");
+		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . "Rearrange\nTags");
 
 		return $f;
 	}
 	
 	protected function react($data = null) : void {
 		$s = $this->getUIInstance()->getSession();
+		$t = $s->getCurrentTag();
 		if (is_null($data)) {
-			if ($s->getRootTag() === $s->getCurrentTag()) {
+			if ($s->getRootTag() === $t) {
 				$f = new ApplyConfirmationForm($this->getUIInstance());
 				$s->getPlayer()->sendForm($f->form());
 				return;
@@ -74,13 +77,31 @@ class NestedTagInspectForm extends BaseForm {
 			$s->closeTag();
 			$s->inspectCurrentTag();
 		}
-		if (is_null($t = $this->buttons[(int)$data] ?? null)) {
-			NBTInspect::getInstance()->switchPlayerUI($this->switchui);
-			$s->switchUI();
-			$s->getUIInstance()->inspect();
+		if ($data >= count($t)) {
+			$data = $data - count($t);
+			switch ($data) {
+				case 0:
+					NBTInspect::getInstance()->switchPlayerUI($this->switchui);
+					$s->switchUI();
+					$s->getUIInstance()->inspect();
+					break;
+				
+				case 1:
+					if ($s->getRootTag() === $s->getCurrentTag()) $s->getPlayer()->sendForm((new RearrangeTagForm($this->getSession()))->form());
+					else {
+						$s->deleteCurrentTag();
+						$s->inspectCurrentTag();
+					}
+					break;
+
+				case 2:
+					$s->getPlayer()->sendForm((new RearrangeTagForm($this->getSession()))->form());
+					break;
+			}
 			return;
 		}
-		$s->openTag($t);
+		if ($t instanceof CompoundTag) foreach ($t->getValue() as $k => $v) if ($k === $data) $s->openTag($t->getTag($v));
+		else $s->openTag($t[$v]);
 		$s->inspectCurrentTag();
 	}
 
