@@ -25,30 +25,14 @@ use pocketmine\utils\TextFormat as TF;
 use pocketmine\scheduler\{ClosureTask, TaskHandler};
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect, sessions\InspectSession, uis\UIInterface};
+use Endermanbugzjfc\NBTInspect\NBTInspect;
 
 class FormUI implements UIInterface {
 
-	private $session;
 	protected $preinspect = null;
-	protected $previous = null;
 
-	protected function __construct(InspectSession $session) {
-		$this->session = $session;
-	}
-	
 	public static function getName() : string {
 		return 'Form';
-	}
-
-	public static function create(InspectSession $session, UIInterface $previous = null) : self {
-		$self = new self($session);
-		$self->previous = $previous;
-		return $self;
-	}
-
-	public function getSession() : InspectSession {
-		return $this->session;
 	}
 
 	public function preInspect() {
@@ -93,9 +77,5 @@ class FormUI implements UIInterface {
 	}
 
 	public function close() {return $this;}
-
-	public function getPreviousUI() : ?UIInterface {
-		return $this->previous;
-	}
 	
 }

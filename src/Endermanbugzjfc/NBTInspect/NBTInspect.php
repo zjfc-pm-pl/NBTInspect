@@ -21,9 +21,16 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{Player, nbt\tag\NamedTag, item\Item, entity\Entity};
+use pocketmine\{Player,
+	nbt\tag\NamedTag,
+	item\Item,
+	entity\Entity,
+	level\Level,
+	command\Command,
+	command\CommandSender
+};
 
-use muqsit\invmenu\{InvMenu, InvMenuHandler};
+// use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
 use function is_a;
 
@@ -39,7 +46,7 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 
 	public function onEnable() : void {
 		self::$instance = $this;
-		if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
+		// if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
@@ -47,44 +54,52 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 		unset($this->players[$ev->getPlayer()->getId()]);
 	}
 
-	public function inspectSessionOpenEvent(events\InspectSessionOpenEvent $ev) : void {
-		if ($ev->isCancelled()) return;
-	}
-
-	public function playerSwitchUiEvent(events\PlayerSwitchUIEvent $ev) : void {
-		if ($ev->isCancelled()) return;
-		$this->players[$p->getId()] = $ev->getUI();
-	}
-
 	public static function getInstance() : ?self {
 		return self::$instance;
 	}
 
-	public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : ?sessions\InspectSession {
-		($ev = new events\InspectSessionOpenEvent($p, $nbt, $onsave))->call();
-		return $ev->getSession();
+	public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : sessions\InspectSession {
+		$s = new sessions\InspectSession($p, $nbt, $onsave);
+		$s->inspectCurrentTag();
 	}
 
-	public static function inspectItem(Player $p, Item $item) : ?sessions\InspectSession {
+	public static function inspectItem(Player $p, Item $item) : sessions\InspectSession {
 		return $this->inspect($p, $item->getNamedTag(), function(NamedTag $nbt) use ($item) : void {
-			if (!$item instanceof Item) return;
-			$item->setNamedTag($nbt);
+			self::disclaimerScreen($p, function(Player $p, $data = false) {
+				if (!$data) return;
+				if (!$item instanceof Item) return;
+				$item->setNamedTag($nbt);
+			});
 		});
 	}
 
-	public static function inspectEntity(Player $p, Entity $entity) : ?sessions\InspectSession {
+	public static function inspectEntity(Player $p, Entity $entity) : sessions\InspectSession {
 		return $this->inspect($p, $entity->namedtag, function(NamedTag $nbt) use ($entity) : void {
-			if (!$entity instanceof Entity) return;
-			$entity->namedtag = $nbt;
+			self::disclaimerScreen($p, function(Player $p, $data = false) {
+				if (!$data) return;
+				if (!$entity instanceof Entity) return;
+				$entity->namedtag = $nbt;
+			});
 		});
 	}
 
-	public function switchPlayerUI(Player $p, uis\UIInterface $ui) : events\PlayerSwitchUIEvent {
+	public static function inspectLevel(Player $p, Level $w) : sessions\InspectSession {
+		return $this->inspect($p, $w->getLevelData(), function(NamedTag $nbt) use ($w) : void {
+			if (!$w instanceof Level) return;
+			$reflect = new \ReflectionProperty($w, 'levelData');
+			$reflect->setAccessible(true);
+			$reflect->setValue($reflect->class, $nbt);
+		});
+	}
+
+	private static function disclaimerScreen(Player $p, \closure $callbacl) : \jojoe77777\FormAPI\ModalForm {}
+
+	public function switchPlayerUI(Player $p, uis\UIInterface $ui) {
 		$this->players[$p->getId()] = $ui;
 		return $this;
 	}
 
-	public function getPlayerUI(Player $p) : uis\UIInterface {
+	public function getPlayerUI(Player $p) : string {
 		return $this->players[$p->getId()] ?? self::UI_DEFAULT;
 	}
 
@@ -106,4 +121,6 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 	public function getAllUI() : array {
 		return $this->uis;
 	}
+
+	public function onCommand(CommandSender $p, Command $cmd, string $aliase, array $args) : bool {}
 }

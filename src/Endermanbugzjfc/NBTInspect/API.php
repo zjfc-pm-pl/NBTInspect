@@ -21,19 +21,28 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{Player, item\Item, entity\Entity, nbt\tag\NamedTag};
+use pocketmine\{Player,
+	nbt\tag\NamedTag,
+	item\Item,
+	entity\Entity,
+	level\Level
+};
 
 trait API {
 	
-	abstract public static function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : ?sessions\InspectSession;
+	abstract public function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : sessions\InspectSession;
 	/*
 		Automatically applys the NBT to the target item / entity when it has changes
 	*/
-	abstract public static function inspectItem(Player $p, Item $item) : ?sessions\InspectSession;
-	abstract public static function inspectEntity(Player $p, Entity $entity) : ?sessions\InspectSession;
+	abstract public static function inspectItem(Player $p, Item $item) : sessions\InspectSession;
+	abstract public static function inspectEntity(Player $p, Entity $entity) : sessions\InspectSession;
+	abstract public static function inspectLevel(Player $p, Level $entity) : sessions\InspectSession;
 
-	abstract public function switchPlayerUI(Player $p, uis\UIInterface $ui) : events\PlayerSwitchUIEvent;
-	abstract public function getPlayerUI(Player $p) : uis\UIInterface;
+	/*
+		The UI argument / return value is the class namespace of UI that the player is using
+	*/
+	abstract public function switchPlayerUI(Player $p, string $ui);
+	abstract public function getPlayerUI(Player $p) : string;
 
 	/*
 		Please input the namespace of a class that implements UIInterface
