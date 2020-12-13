@@ -47,9 +47,10 @@ class NestedTagInspectForm extends BaseForm {
 			return $t->getName() . TF::BOLD . '(' . Utils::shortenTagType() . $t . TF::AQUA . ')';
 		}, $s->getAllOpenedTags(true))) . "\n" . TF::RESET . TF::YELLOW . 'Tags: ' . TF::AQUA . $t->getCount() . ' of ' . (Utils::printTagType($t) ?? TF::BLACK . 'Mixed') . TF::AQUA . ' type');
 
-		foreach ($t->getValue() as $st) {
+		foreach ($t->getValue() as $k => $st) {
 			$this->buttons[] = $st;
-			$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::printTagType($st) . ' Tag');
+			if ($t instanceof CompoundTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::printTagType($st) . ' Tag');
+			else $this->getForm()->addButton(TF::BLUE . 'Tag' . "\n" . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
 		}
 
 		if (($pui = $s->getPreviousUI()) instanceof UIInterface) {
@@ -87,7 +88,7 @@ class NestedTagInspectForm extends BaseForm {
 					break;
 				
 				case 1:
-					if ($s->getRootTag() === $s->getCurrentTag()) $s->getPlayer()->sendForm((new RearrangeTagForm($this->getSession()))->form());
+					if ($s->getRootTag() === $s->getCurrentTag()) $s->getPlayer()->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
 					else {
 						$s->deleteCurrentTag();
 						$s->inspectCurrentTag();
@@ -95,7 +96,8 @@ class NestedTagInspectForm extends BaseForm {
 					break;
 
 				case 2:
-					$s->getPlayer()->sendForm((new RearrangeTagForm($this->getSession()))->form());
+					if ($t instanceof ListTag) $s->getPlayer()->sendForm((new RearrangeTagForm($this->getUIInstance()->getSession()))->form());
+					else $s->inspectCurrentTag();
 					break;
 			}
 			return;
