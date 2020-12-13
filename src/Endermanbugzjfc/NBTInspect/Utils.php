@@ -25,6 +25,8 @@ use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 use pocketmine\utils\TextFormat as TF;
 
+use const PHP_INT_MAX;
+
 class Utils {
 
 	public static function printTagType(NamedTag $tag, bool $color = true) : ?string {
@@ -161,7 +163,8 @@ class Utils {
 				break;
 				
 			case NBT::TAG_Long:
-				return 'Int (-9223372036854775808[-2ˆ63] ~ 9.2233720368548E+18[2ˆ63-1])';
+				// return 'Int (-9223372036854775808[-2ˆ63] ~ 9.2233720368548E+18[2ˆ63-1])';
+				return 'Int (-9223372036854775808[-2ˆ63] ~ ' . PHP_INT_MAX . '[PHP_INT_MAX])';
 				break;
 				
 			case NBT::TAG_Float:

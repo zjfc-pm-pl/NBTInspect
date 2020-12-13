@@ -36,6 +36,7 @@ class NumbericValueEditForm extends ValueEditForm {
 		$s = $this->getUIInstance()->getSession();
 		$t = $this->getUIInstance()->getSession()->getCurrentTag();
 		$f->addLabel(TF::YELLOW . 'Acceptable value range: ' . TF::BOLD . TF::GOLD . (Utils::getNumbericTagAcceptableValueRange($t) ?? TF::RED . 'UNKNOWN'));
+		$f->addSwitch(TF::RED . 'Delete tag');
 		return $f;
 	}
 
@@ -48,6 +49,12 @@ class NumbericValueEditForm extends ValueEditForm {
 			return;
 		}
 		array_shift($data);
+		array_shift($data);
+		if ($data[0]) {
+			$s->deleteCurrentTag();
+			$s->inspectCurrentTag();
+			return;
+		}
 		array_shift($data);
 		$t = $s->getCurrentTag();
 		switch (true) {

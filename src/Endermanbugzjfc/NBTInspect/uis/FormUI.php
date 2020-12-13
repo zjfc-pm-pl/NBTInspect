@@ -68,6 +68,7 @@ class FormUI implements UIInterface {
 				break;
 
 			case $tag instanceof StringTag:
+			case $tag instanceof ByteArrayTag:
 				return new forms\StringValueEditForm($this);
 				break;
 
@@ -80,7 +81,6 @@ class FormUI implements UIInterface {
 				return new forms\NumbericValueEditForm($this);
 				break;
 
-			case $tag instanceof ByteArrayTag:
 			case $tag instanceof IntArrayTag:
 				return new forms\BatchNumbericValueEditForm($this);
 				break;

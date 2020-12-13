@@ -82,14 +82,65 @@ class InspectSession {
 		return $this->tag[0];
 	}
 
+	public function deleteCurrentTag() {
+		$c = $this->getCurrentTag();
+		$this->closeTag();
+		$t = $this->getCurrentTag();
+		switch (true) {
+			case $t instanceof CompoundTag:
+				if (!$t->hasTag($tag->getName(), $tag::class)) throw new \InvalidArgumentException('Cannot delete the given tag as it is not a child tag of the parent tag');
+				$t->remove($tag->getName());
+				break;
+
+			case $t instanceof ListTag:
+				foreach ($t->getValue() as $k => $v) if ($v === $tag) {
+					unset($t[$k]);
+					break 2;
+				}
+				throw new \InvalidArgumentException('Cannot delete the given tag as it is not a child tag of the parent tag');
+				break;
+			
+			default:
+				assert(false);
+				break;
+		}
+		return $this;
+	}
+
 	public function getAllOpenedTags(bool $reverse = false) : array {
 		if ($reverse) return array_reverse($this->tag);
 		return $this->tag;
 	}
 
 	public function openTag(NamedTag $tag) {
-		if (!(($this->getCurrentTag() instanceof CompoundTag) or ($this->getCurrentTag() instanceof ListTag))) throw new \InvalidStateException('You cannot open a child tag when the current tag is not ' . CompoundTag::class . ' or ' . ListTag::class);
-		$this->tag[] = $tag->getTag($tag->getName(), $tag::class);
+		$t = $this->getCurrentTag();
+		switch (true) {
+			case $t instanceof CompoundTag:
+				if (!$t->hasTag($tag->getName(), $tag::class)) throw new \InvalidArgumentException('Cannot open the given tag as it is not a child tag of the parent tag');
+				$this->tag[] = $tag->getTag($tag->getName(), $tag::class);
+				break;
+
+			case $t instanceof ListTag:
+				foreach ($t->getValue() as $v) if ($v === $tag) {
+					$this->tag[] = $v;
+					break 2;
+				}
+				throw new \InvalidArgumentException('Cannot open the given tag as it is not a child tag of the parent tag');
+				break;
+			
+			default:
+				throw new \InvalidStateException('You cannot open a child tag when the current tag is not ' . CompoundTag::class . ' or ' . ListTag::class);
+				break;
+		}
+
+		return $this;
+	}
+
+	public function closeTag(int $amount = 1) {
+		for ($i=0; $i < $amount; $i++) {
+			if (count($this->tag) <= 1) throw new \BadMethodCallException('Cannot close the root tag, please close the inspect session instead');
+			array_shift($this->tag);
+		}
 
 		return $this;
 	}
@@ -107,15 +158,6 @@ class InspectSession {
 	public function switchUI() {
 		if (isset($this->ui)) $this->ui->close();
 		$this->ui = NBTInspect::getPlayerUI($this->getPlayer())::create($this);
-
-		return $this;
-	}
-
-	public function closeTag(int $amount = 1) {
-		for ($i=0; $i < $amount; $i++) {
-			if (count($this->tag) <= 1) throw new \BadMethodCallException('Cannot close the root tag, please close the inspect session instead');
-			array_shift($this->tag);
-		}
 
 		return $this;
 	}
