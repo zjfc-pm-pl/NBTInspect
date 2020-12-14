@@ -30,12 +30,15 @@ use function is_null;
 use function array_shift;
 
 class NumbericValueEditForm extends ValueEditForm {
+
+	private $invalid = falses;
 	
 	protected function form() : \jojoe77777\FormAPI\Form {
 		$f = parent::form();
 		$s = $this->getUIInstance()->getSession();
 		$t = $this->getUIInstance()->getSession()->getCurrentTag();
 		$f->addLabel(TF::YELLOW . 'Acceptable value range: ' . TF::BOLD . TF::GOLD . (Utils::getNumbericTagAcceptableValueRange($t) ?? TF::RED . 'UNKNOWN'));
+		if ($this->invalid) $f->addLabel(TF::BOLD . TF::RED . 'Invalid value given!');
 		if ($s->getRootTag() !== $s->getCurrentTag()) $f->addSwitch(TF::RED . 'Delete tag');
 		return $f;
 	}
@@ -50,6 +53,7 @@ class NumbericValueEditForm extends ValueEditForm {
 		}
 		array_shift($data);
 		array_shift($data);
+		if ($this->invalid) array_shift($data);
 		if ($s->getRootTag() !== $s->getCurrentTag()) {
 			if ($data[0]) {
 				$s->deleteCurrentTag();
@@ -62,11 +66,16 @@ class NumbericValueEditForm extends ValueEditForm {
 		switch (true) {
 			case $t instanceof FloatTag:
 			case $t instanceof DoubleTag:
-				$t->setValue((float)$tag);
+				$t->setValue((float)$data[0]);
 				break;
 			
 			default:
-				$t->setValue((int)$tag);
+				if (!Utils::isValidValue($t, (int)$data[0])) {
+					$this->invalid = true;
+					$s->getPlayer()->sendForm($this->form());
+					return;
+				}
+				$t->setValue((int)$data[0]);
 				break;
 		}
 		if ($s->getRootTag() === $s->getCurrentTag()) {

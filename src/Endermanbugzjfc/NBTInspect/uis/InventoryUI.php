@@ -77,7 +77,7 @@ class InventoryUI extends BaseUI {
 			NBTInspect::getInstance()->switchPlayerUI(NBTInspect::UI_DEFAULT);
 			$this->getSession()->switchUI();
 			$this->getSession()->inspectCurrentTag();
-		})
+		});
 		$f->setTitle('');
 		$f->setContent(TF::YELLOW . 'More UIs are coming soon!');
 		$f->setButton1('');

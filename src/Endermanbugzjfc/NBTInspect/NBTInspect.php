@@ -27,7 +27,8 @@ use pocketmine\{Player,
 	entity\Entity,
 	level\Level,
 	command\Command,
-	command\CommandSender
+	command\CommandSender,
+	utils\TextFormat as TF
 };
 
 // use muqsit\invmenu\{InvMenu, InvMenuHandler};
@@ -92,7 +93,14 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 		});
 	}
 
-	private static function disclaimerScreen(Player $p, \closure $callbacl) : \jojoe77777\FormAPI\ModalForm {}
+	private static function disclaimerScreen(Player $p, \closure $callback) : \jojoe77777\FormAPI\ModalForm {
+		$f = \jojoe77777\FormAPI\ModalForm($callback);
+		$f->addTitle(TF::BOLD . TF::BLUE . '>> ' . TF::DARK_AQUA . '!WARNING!' . TF::BLUE . ' <<');
+		$f->setContent(TF::YELLOW . 'This plugin should only be use on ' . TF::BOLD . 'debug purpose,' . TF::RESET . TF::YELLOW . ' there ' . TF::BOLD . TF::RED . 'might be a chance to break your server or corrupt your world files!' . TF::RESET . TF::YELLOW . 'It is not my fault if this happens to you.');
+		$f->setButton1(TF::BLUE . 'Continue Inspecting');
+		$f->setButton2(TF::DARK_AQU . 'Back');
+		$p->sendForm($f);
+	}
 
 	public function switchPlayerUI(Player $p, uis\UIInterface $ui) {
 		$this->players[$p->getId()] = $ui;

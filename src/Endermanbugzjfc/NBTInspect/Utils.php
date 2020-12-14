@@ -178,4 +178,21 @@ class Utils {
 		}
 	}
 
+	public static function isValidValue(NamedTag $tag, int $value) : bool {
+		switch ($tag) {
+			case $tag instanceof ByteTag:
+				return !($value < -128 or $value > 127);
+				break;
+
+			case $tag instanceof ShortTag:
+				return !($value < -0x8000 or $value > 0x7fff);
+				break;
+
+			case $tag instanceof IntTag:
+				return !($value < -0x80000000 or $value > 0x7fffffff);
+				break;
+		}
+		return true;
+	}
+
 }
