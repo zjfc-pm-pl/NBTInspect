@@ -50,7 +50,7 @@ class InspectSession {
 	}
 
 	public function getRootTag() : ?NamedTag {
-		return $this->getAllOpenedTags(true)[0] ?? null;
+		return $this->getAllOpenedTags()[0] ?? null;
 	}
 
 	protected function getOriginRootTag() : ?NamedTag {
@@ -107,8 +107,8 @@ class InspectSession {
 		return $this;
 	}
 
-	public function getAllOpenedTags(bool $reverse = false) : array {
-		if ($reverse) return array_reverse($this->tag);
+	public function getAllOpenedTags(bool $from_current = true) : array {
+		if ($from_current) return array_reverse($this->tag);
 		return $this->tag;
 	}
 

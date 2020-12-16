@@ -25,7 +25,7 @@ use pocketmine\utils\TextFormat as TF;
 
 use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm, ModalForm};
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface};
+use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\FormUI};
 
 abstract class BaseForm {
 
@@ -38,7 +38,7 @@ abstract class BaseForm {
 	private $ui;
 	private $form;
 
-	public function __construct(UIInterface $ui) {
+	public function __construct(FormUI $ui) {
 		$this->ui = $ui;
 		$this->resetForm();
 		$ui->getSession()->getPlayer()->sendForm($this->form());
@@ -52,7 +52,7 @@ abstract class BaseForm {
 	abstract protected function react($data = null) : void;
 	abstract protected function form() : Form;
 	
-	public function getUIInstance() : UIInterface {
+	public function getUIInstance() : FormUI {
 		return $this->ui;
 	}
 
