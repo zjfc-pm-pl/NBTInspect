@@ -25,25 +25,31 @@ use pocketmine\{Player, utils\TextFormat as TF};
 /*use pocketmine\scheduler\{ClosureTask, TaskHandler};
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};*/
 
+use muqsit\invmenu\{InvMenu, InvMenuHandler, MenuIds};
+
 use Endermanbugzjfc\NBTInspect\NBTInspect;
+
+use function assert();
 
 class InventoryUI extends BaseUI {
 
-	protected $preinspect = null;
+	private $invmenu = null;
+	private $action = null;
 	
 	public static function getName() : string {
 		return 'Inventory';
 	}
 
 	public function preInspect() {
-		/*$this->preinspect = NBTInspect::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $ct) : void {
-			$this->getSession()->getPlayer()->sendPopup(TF::YELLOW . 'Loading NBT tag to inspect...');
-		}), 40);*/
+		if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
+		$ui = $this->getInvMenuInstance();
 
 		return $this;
 	}
 
 	public function inspect() {
+		if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
+		$ui = $this->getInvMenuInstance();
 		/*if ($this->preinspect instanceof TaskHandler) $this->preinspect->cancel();
 		switch (true) {
 			case $tag instanceof CompoundTag:
@@ -86,6 +92,26 @@ class InventoryUI extends BaseUI {
 		return $this;
 	}
 
-	public function close() {return $this;}
+	public function onInventoryClose() : void {}
+
+	public function close() {
+		$this->getSession()->getPlayer()->removeWindow($this->getInvMenuInstance()->getInventory());
+		return $this;
+	}
+
+	public function getInvMenuInstance() : InvMenu {
+		if (!$this->invmenu instanceof InvMenu) $this->invmenu = InvMenu::create(MenuIds::TYPE_DOUBLE_CHEST);
+		self::validateInvMenu($this->invmenu);
+		return $this->invmenu;
+	}
+
+	public function getCurrentInventoryAction() : ?inventories\BaseInventoryUIActionClass {
+		return $this->action;
+	}
+
+	protected function validateInventory(InvMenu $ui) {
+		assert($ui->getType()->getSize() === 54);
+		return $this;
+	}
 	
 }

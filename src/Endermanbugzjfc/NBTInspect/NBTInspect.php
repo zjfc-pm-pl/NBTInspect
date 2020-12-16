@@ -31,8 +31,6 @@ use pocketmine\{Player,
 	utils\TextFormat as TF
 };
 
-// use muqsit\invmenu\{InvMenu, InvMenuHandler};
-
 use function is_a;
 
 final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketmine\event\Listener {
@@ -47,7 +45,6 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 
 	public function onEnable() : void {
 		self::$instance = $this;
-		// if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
