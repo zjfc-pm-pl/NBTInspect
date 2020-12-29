@@ -28,14 +28,16 @@ use pocketmine\{Player,
 	level\Level,
 	command\Command,
 	command\CommandSender,
-	utils\TextFormat as TF
+	utils\TextFormat as TF,
+	event\Listener,
+	plugin\PluginBase
 };
 
 // use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
 use function is_a;
 
-final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketmine\event\Listener {
+final class NBTInspect extends PluginBase implements Listener {
 	use API;
 
 	public const UI_DEFAULT = uis\FormUI::class;
@@ -130,5 +132,7 @@ final class NBTInspect extends \pocketmine\plugin\PluginBase implements \pocketm
 		return $this->uis;
 	}
 
-	public function onCommand(CommandSender $p, Command $cmd, string $aliase, array $args) : bool {}
+	public function onCommand(CommandSender $p, Command $cmd, string $aliase, array $args) : bool {
+		if ($cmd->getName() !== 'nbtinspect') return true;
+	}
 }
