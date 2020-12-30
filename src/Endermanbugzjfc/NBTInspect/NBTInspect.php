@@ -36,6 +36,7 @@ use pocketmine\{Player,
 // use muqsit\invmenu\{InvMenu, InvMenuHandler};
 
 use function is_a;
+use function strtolower;
 
 final class NBTInspect extends PluginBase implements Listener {
 	use API;
@@ -134,5 +135,15 @@ final class NBTInspect extends PluginBase implements Listener {
 
 	public function onCommand(CommandSender $p, Command $cmd, string $aliase, array $args) : bool {
 		if ($cmd->getName() !== 'nbtinspect') return true;
+		if (!$p instanceof Player) $p->sendMessage('Please use this command in-game!');
+		else switch (strtolower($args[0] ?? 'help')) {
+			case 'help':
+				$cmdl[] = 'help' . TF::ITALIC . TF::GRAY . ' (Display NBTInspect plugin command usage)';
+				if ($p->hasPermission(nbtinspect.cmd.item)) $cmdl[] = 'item' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT meta data of the item in main hand)';
+				if ($p->hasPermission(nbtinspect.cmd.item)) $cmdl[] = 'entity <Entity ID>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT meta data of an entity by the entity ID)';
+				$p->sendMessage(TF::BOLD . GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
+				break;
+		}
+		return true;
 	}
 }
