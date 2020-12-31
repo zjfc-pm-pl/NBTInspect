@@ -151,7 +151,17 @@ final class NBTInspect extends PluginBase implements Listener {
 
 			case 'item':
 				if (($item = $p->getInventory()->getItemInHand())->getId() === Item::AIR) $p->sendMessage(TF::BOLD . TF::RED . 'Please hold an item in your main hand to inspect!');
-				$this->inspectItem($p, $item);
+				else $this->inspectItem($p, $item);
+				break;
+
+			case 'entity':
+				if (!isset($args[1]) or ($entity = $this->getServer()->findEntity($args[1] ?? -1)) === null) $p->sendMessage(TF::BOLD . TF::RED . 'Entity not found!');
+				else $this->inspectEntity($p, $entity);
+				break;
+
+			case 'level':
+				if (!isset($args[1]) or ($level = $this->getServer()->getLevel($args[1] ?? -1)) === null) $p->sendMessage(TF::BOLD . TF::RED . 'Level not dosen\'t exist or not loaded!');
+				else $this->inspectLevel($p, $level);
 				break;
 		}
 		return true;
