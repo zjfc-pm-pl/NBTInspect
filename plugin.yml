@@ -25,8 +25,11 @@ permissions:
 				children:
 					nbtinspect.cmd.item:
 						default: op
-						description: 'Permission to inspect the NBT meta data of an item in main hand slot'
+						description: 'Permission to inspect the NBT data of an item in main hand slot'
 					nbtinspect.cmd.entity:
 						default: op
-						description: 'Permission to inspect the NBT meta data of an entity by entity ID' 
+						description: 'Permission to inspect the NBT data of an entity by entity ID' 
+					nbtinspect.cmd.level:
+						default: op
+						description: 'Permission to inspect the NBT data of a loaded level by the level folder name' 
 #

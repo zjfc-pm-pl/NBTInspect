@@ -99,9 +99,9 @@ final class NBTInspect extends PluginBase implements Listener {
 	private static function disclaimerScreen(Player $p, \closure $callback) : \jojoe77777\FormAPI\ModalForm {
 		$f = \jojoe77777\FormAPI\ModalForm($callback);
 		$f->addTitle(TF::BOLD . TF::BLUE . '>> ' . TF::DARK_AQUA . '!WARNING!' . TF::BLUE . ' <<');
-		$f->setContent(TF::YELLOW . 'This plugin should only be use on ' . TF::BOLD . 'debug purpose,' . TF::RESET . TF::YELLOW . ' there ' . TF::BOLD . TF::RED . 'might be a chance to break your server or corrupt your world files!' . TF::RESET . TF::YELLOW . 'It is not my fault if this happens to you.');
-		$f->setButton1(TF::BLUE . 'Continue Inspecting');
-		$f->setButton2(TF::DARK_AQU . 'Back');
+		$f->setContent(TF::YELLOW . 'This plugin should only be use for ' . TF::BOLD . 'debugging and ' . TF::RED . 'have a chance to break your server or corrupt your world files!');
+		$f->setButton1(TF::BLUE . 'Continue');
+		$f->setButton2(TF::DARK_AQUA . 'Back');
 		$p->sendForm($f);
 	}
 
@@ -139,9 +139,19 @@ final class NBTInspect extends PluginBase implements Listener {
 		else switch (strtolower($args[0] ?? 'help')) {
 			case 'help':
 				$cmdl[] = 'help' . TF::ITALIC . TF::GRAY . ' (Display NBTInspect plugin command usage)';
-				if ($p->hasPermission(nbtinspect.cmd.item)) $cmdl[] = 'item' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT meta data of the item in main hand)';
-				if ($p->hasPermission(nbtinspect.cmd.item)) $cmdl[] = 'entity <Entity ID>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT meta data of an entity by the entity ID)';
+
+				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of the item in main hand)';
+
+				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'entity <Entity ID>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity by the entity ID)';
+
+				if ($p->hasPermission('nbtinspect.cmd.level')) $cmdl[] = 'level <Level folder name>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a loaded level by the level folder name)';
+
 				$p->sendMessage(TF::BOLD . GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
+				break;
+
+			case 'item':
+				if (($item = $p->getInventory()->getItemInHand())->getId() === Item::AIR) $p->sendMessage(TF::BOLD . TF::RED . 'Please hold an item in your main hand to inspect!');
+				$this->inspectItem($p, $item);
 				break;
 		}
 		return true;
