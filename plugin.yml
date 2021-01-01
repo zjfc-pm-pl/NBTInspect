@@ -9,27 +9,27 @@ description: A in-game NBT editing / debugging tool!
 # (For example YouTube)
 website: https://github.com/Endermanbugzjfc/NBTInspect/
 
-comamnds:
-	nbtinspect:
-		description: 'Inspect the NBT meta data of an entity or item in-game'
-		usage: '/nbtinspect help'
-		permission: 'nbtinspect.cmd'
+commands:
+  nbtinspect:
+    description: 'Inspect the NBT meta data of an entity or item in-game'
+    usage: '/nbtinspect help'
+    permission: 'nbtinspect.cmd'
 #
 
 permissions:
-	nbtinspect:
-		default: op
-		children:
-			nbtinspect.cmd:
-				default: op
-				children:
-					nbtinspect.cmd.item:
-						default: op
-						description: 'Permission to inspect the NBT data of an item in main hand slot'
-					nbtinspect.cmd.entity:
-						default: op
-						description: 'Permission to inspect the NBT data of an entity by entity ID' 
-					nbtinspect.cmd.level:
-						default: op
-						description: 'Permission to inspect the NBT data of a loaded level by the level folder name' 
+  nbtinspect:
+    default: op
+    children:
+      nbtinspect.cmd:
+        default: op
+        children:
+          nbtinspect.cmd.item:
+            default: op
+            description: 'Permission to inspect the NBT data of an item in main hand slot'
+          nbtinspect.cmd.entity:
+            default: op
+            description: 'Permission to inspect the NBT data of an entity by entity ID' 
+          nbtinspect.cmd.level:
+            default: op
+            description: 'Permission to inspect the NBT data of a loaded level by the level folder name' 
 #
