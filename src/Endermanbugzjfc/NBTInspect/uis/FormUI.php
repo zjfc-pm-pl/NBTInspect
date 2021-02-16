@@ -27,7 +27,7 @@ use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTa
 
 use Endermanbugzjfc\NBTInspect\NBTInspect;
 
-class FormUI implements UIInterface {
+class FormUI extends BaseUI {
 
 	protected $preinspect = null;
 
@@ -49,12 +49,18 @@ class FormUI implements UIInterface {
 			case $tag instanceof CompoundTag:
 			case $tag instanceof ListTag:
 				return new forms\NestedTagInspectForm($this);
-				break;
 
 			case $tag instanceof StringTag:
 			case $tag instanceof ByteArrayTag:
-				return new forms\StringValueEditForm($this);
-				break;
+			case $tag instanceof IntArrayTag:
+				$hotbar = hotbar\BookEditorHotbar($this);
+				if (!$tag instanceof IntArrayTag) $hotbar->allowMode($hotbar::MODE_RAW);
+				$hotbar->allowMode($hotbar::MODE_BINARY);
+				$hotbar->setValue($tag->getValue());
+				$hotbar->setCallback(function(string $value) use ($tag) : void {
+					$tag->setValue($value);
+					$this->getSession()->inspectCurrentTag();
+				});
 
 			case $tag instanceof ByteTag:
 			case $tag instanceof ShortTag:
@@ -63,15 +69,9 @@ class FormUI implements UIInterface {
 			case $tag instanceof FloatTag:
 			case $tag instanceof DoubleTag:
 				return new forms\NumbericValueEditForm($this);
-				break;
-
-			case $tag instanceof IntArrayTag:
-				return new forms\BatchNumbericValueEditForm($this);
-				break;
 
 			default:
 				throw new \RuntimeException('An invalid tag type has given');
-				break;
 		}
 		return $this;
 	}

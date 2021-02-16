@@ -37,7 +37,7 @@ class NumbericValueEditForm extends ValueEditForm {
 		$f = parent::form();
 		$s = $this->getUIInstance()->getSession();
 		$t = $this->getUIInstance()->getSession()->getCurrentTag();
-		$f->addLabel(TF::YELLOW . 'Acceptable value range: ' . TF::BOLD . TF::GOLD . (Utils::getNumbericTagAcceptableValueRange($t) ?? TF::RED . 'UNKNOWN'));
+		$f->addLabel(TF::YELLOW . 'Acceptable value range: ' . TF::BOLD . TF::GOLD . (Utils::getAcceptableNumberValue($t) ?? TF::RED . 'UNKNOWN'));
 		if ($this->invalid) $f->addLabel(TF::BOLD . TF::RED . 'Invalid value given!');
 		if ($s->getRootTag() !== $s->getCurrentTag()) $f->addSwitch(TF::RED . 'Delete tag');
 		return $f;
@@ -70,7 +70,7 @@ class NumbericValueEditForm extends ValueEditForm {
 				break;
 			
 			default:
-				if (!Utils::isValidValue($t, (int)$data[0])) {
+				if (!Utils::validateNumberValue($t, (int)$data[0])) {
 					$this->invalid = true;
 					$s->getPlayer()->sendForm($this->form());
 					return;

@@ -25,7 +25,7 @@ use pocketmine\utils\TextFormat as TF;
 
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
-abstract class BassUI implements UIInterface {
+abstract class BaseUI implements UIInterface {
 
 	private $session;
 	protected $previous = null;
