@@ -46,12 +46,12 @@ class NestedTagInspectForm extends BaseForm {
 
 		$f->setContent(TF::YELLOW . 'Inspecting in: ' . TF::AQUA . implode(TF::RESET . TF::BLUE . ' >> ' . TF::AQUA, array_map(function(NamedTag $t) : string {
 			return $t->getName() . TF::BOLD . '(' . Utils::shortenTagType() . $t . TF::AQUA . ')';
-		}, $s->getAllOpenedTags(true))) . "\n" . TF::RESET . TF::YELLOW . 'Tags: ' . TF::AQUA . $t->getCount() . ' of ' . (Utils::printTagType($t) ?? TF::BLACK . 'Mixed') . TF::AQUA . ' type');
+		}, $s->getAllOpenedTags(true))) . "\n" . TF::RESET . TF::YELLOW . 'Tags: ' . TF::AQUA . $t->getCount() . ' of ' . (Utils::getTagType($t) ?? TF::BLACK . 'Mixed') . TF::AQUA . ' type');
 
 		foreach ($t->getValue() as $k => $st) {
 			$this->buttons[] = $st;
-			if ($t instanceof CompoundTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::printTagType($st) . ' Tag');
-			else $this->getForm()->addButton(TF::BLUE . 'Tag' . "\n" . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
+			if ($t instanceof CompoundTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::getTagType($st) . ‘ Tag’);
+			else $this->getForm()->addButton(TF::BLUE . ‘Tag’ . “\n” . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
 		}
 
 		if (($pui = $s->getPreviousUI()) instanceof UIInterface) {
@@ -59,10 +59,10 @@ class NestedTagInspectForm extends BaseForm {
 			$ui = $uis[array_rand($uis)];
 		} else $ui = InventoryUI::class;
 		$this->switchui = $ui;
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
-		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . "Delete\nThis Tag");
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_GRREEN . "Insert\nNew Tag");
-		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . "Rearrange\nTags");
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . ‘Switch UI’ . TF::RESET . “\n” . TF::BLUE . ‘To ‘ . TF::BOLD . $ui::getName());
+		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . “Delete\nThis Tag”);
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_GRREEN . “Insert\nNew Tag”);
+		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . “Rearrange\nTags”);
 
 		return $f;
 	}

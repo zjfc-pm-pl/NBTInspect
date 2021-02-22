@@ -26,18 +26,28 @@ use pocketmine\{
 	utils\TextFormat as TF
 };
 use pocketmine\nbt\tag\{
-	NamedTag
+	NamedTag,
+	ListTag
 };
 
-use function substr;
+use function str_replace;
 use function strlen;
+use function strpos;
+use function substr;
 
 use const PHP_INT_MAX;
 
 class Utils {
 
-	public static function printTagType(NamedTag $tag, bool $color = true) : ?string {
-		return substr($n = $tag->getName(), 0, strlen($n) - 3);
+	public static function getTagType(NamedTag $tag) : ?string {
+		if (($r = strpos('Array') !== false) $type = substr($type, 0, $r - 1) . ' ' . substr($type, $r - 1);
+		$type = str_replace('Tag', '', $tag->getName());
+		return $type;
+	}
+	
+	public static function getNestedInspectationPath(array $openedt
+	ags) : string {
+		foreach ($openedtags as $i => $tag) $path .= ($i > 0 ? TF::RESET . TF::YELLOW . ' > ' : '') . TF::BOLD . TF::GOLD . (empty($tag->getName()) and isset($openedtags[$i]) and $openedtags[$i] instanceof ListTag ? (self::getListTagChildIndex($openedtags[$i], $tag)) : $tag->getName()) . TF::AQUA . ' (' . self::getTagType($tag) . ')';
 	}
 
 	public static function getAcceptableNumberValue(NamedTag $tag) : ?string {
