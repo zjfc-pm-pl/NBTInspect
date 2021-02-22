@@ -21,9 +21,12 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
-use pocketmine\utils\TextFormat as TF;
+use pocketmine\{
+	Player,
+	utils\TextFormat as TF
+};
 
-use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm, ModalForm};
+use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm};
 
 use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\FormUI};
 
@@ -31,7 +34,6 @@ abstract class BaseForm {
 
 	protected const CUSTOM = CustomForm::class;
 	protected const SIMPLE = SimpleForm::class;
-	protected const MODAL = ModalForm::class;
 
 	protected const TYPE = null;
 
@@ -44,7 +46,7 @@ abstract class BaseForm {
 		$ui->getSession()->getPlayer()->sendForm($this->form());
 	}
 
-	public function preReact(\pocketmine\Player $p, $data = null) : void {
+	public function preReact(Player $p, $data = null) : void {
 		$this->resetForm();
 		$this->react($react);
 	}

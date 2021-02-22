@@ -168,11 +168,11 @@ class InspectSession {
 		return $this;
 	}
 	
-	public function getOnSaveCallback() : ?callable {
+	public function getOnSaveCallback() : ?\Closure {
 		return $this->onsave;
 	}
 
-	public function setOnSaveCallback(callable $onsave) {
+	public function setOnSaveCallback(\Closure $onsave) {
 		Utils::validateCallableSignaure(function(NamedTag $edited) {}, $onsave);
 		$this->onsave = $onsave;
 

@@ -24,16 +24,17 @@ namespace Endermanbugzjfc\NBTInspect\uis\forms;
 use pocketmine\utils\TextFormat as TF;
 use pocketmine\nbt\tag\{FloatTag, DoubleTag};
 
+use jojoe77777\FormAPI\Form;
+
 use Endermanbugzjfc\NBTInspect\Utils;
 
-use function is_null;
 use function array_shift;
 
 class NumbericValueEditForm extends ValueEditForm {
 
 	private $invalid = falses;
 	
-	protected function form() : \jojoe77777\FormAPI\Form {
+	protected function form() : Form {
 		$f = parent::form();
 		$s = $this->getUIInstance()->getSession();
 		$t = $this->getUIInstance()->getSession()->getCurrentTag();
@@ -45,7 +46,7 @@ class NumbericValueEditForm extends ValueEditForm {
 
 	protected function react($data = null) : void {
 		$s = $this->getUIInstance()->getSession();
-		if (is_null($data)) {
+		if (!isset($data)) {
 			if ($s->getRootTag() === $s->getCurrentTag()) return;
 			$s->closeTag();
 			$s->inspectCurrentTag();

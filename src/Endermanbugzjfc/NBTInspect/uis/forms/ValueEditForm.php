@@ -23,6 +23,8 @@ namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
 use pocketmine\utils\TextFormat as TF;
 
+use jojoe77777\FormAPI\Form;
+
 use Endermanbugzjfc\NBTInspect\Utils;
 
 use function array_map;
@@ -31,7 +33,7 @@ abstract class NestedTagInspectForm extends BaseForm {
 
 	protected const TYPE = self::CUSTOM;
 	
-	protected function form() : \jojoe77777\FormAPI\Form {
+	protected function form() : Form {
 		$f = $this->getForm();
 		$s = $this->getUIInstance()->getSession();
 

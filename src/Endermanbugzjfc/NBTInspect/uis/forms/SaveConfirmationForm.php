@@ -23,13 +23,13 @@ namespace Endermanbugzjfc\NBTInspect\uis\fomrs;
 
 use pocketmine\utils\TextFormat as TF;
 
-use function is_null;
+use jojoe77777\FormAPI\Form;
 
 class SaveConfirmationForm extends BaseForm {
 
 	protected const TYPE = self::SIMPLE;
 	
-	protected function form() : \jojoe77777\FormAPI\Form {
+	protected function form() : Form {
 		$f = $this->getForm();
 
 		$f->setTitle(TF::BLUE . 'Save ' . TF::DARK_AQUA . 'Confirmation');

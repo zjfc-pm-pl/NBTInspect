@@ -23,11 +23,12 @@ namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
 use pocketmine\utils\TextFormat as TF;
 
+use jojoe77777\FormAPI\Form;
+
 use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface, uis\InventoryUI};
 
 use function implode;
 use function array_map;
-use function is_null;
 use function array_search;
 
 class NestedTagInspectForm extends BaseForm {
@@ -37,7 +38,7 @@ class NestedTagInspectForm extends BaseForm {
 	private $buttons = [];
 	protected $switchui;
 
-	protected function form() : \jojoe77777\FormAPI\Form {
+	protected function form() : Form {
 		$f = $this->getForm();
 		$s = $this->getUIInstance()->getSession();
 
@@ -69,7 +70,7 @@ class NestedTagInspectForm extends BaseForm {
 	protected function react($data = null) : void {
 		$s = $this->getUIInstance()->getSession();
 		$t = $s->getCurrentTag();
-		if (is_null($data)) {
+		if (!isset($data)) {
 			if ($s->getRootTag() === $t) {
 				$f = new ApplyConfirmationForm($this->getUIInstance());
 				$s->getPlayer()->sendForm($f->form());

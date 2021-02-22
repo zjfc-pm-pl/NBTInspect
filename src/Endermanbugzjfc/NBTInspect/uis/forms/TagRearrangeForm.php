@@ -23,8 +23,9 @@ namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
 use pocketmine\utils\TextFormat as TF;
 
+use jojoe77777\FormAPI\Form;
+
 use function array_search;
-use function is_null;
 use function array_shift;
 use function in_array;
 
@@ -35,7 +36,7 @@ class TagRearrangeForm extends BaseForm {
 	protected $illegal = false;
 	private $default = [];
 	
-	protected function form() : \jojoe77777\FormAPI\Form {
+	protected function form() : Form {
 		$f = $this->getForm();
 		$s = $this->UIInstance()->getSession();
 		$t = $s->getCurrentTag();
@@ -51,7 +52,7 @@ class TagRearrangeForm extends BaseForm {
 	}
 
 	protected function react($data = null) : void {
-		if (is_null($data)) {
+		if (!isset($data)) {
 			$s->inspectCurrentTag();
 			return;
 		}
