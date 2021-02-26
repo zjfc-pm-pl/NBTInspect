@@ -33,7 +33,14 @@ use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
 interface API {
 	
-	public function inspect(Player $p, NamedTag $nbt, ?callable $onsave) : InspectSession;
+	/**
+	 * Description
+	 * @param Player $p 
+	 * @param NamedTag $nbt
+	 * @param ?\Closure $onsave A closure isntance that is compatible with <code>function(<@link NamedTag> $nbt)</code>
+	 * @return InspectSession
+	 */
+	public function inspect(Player $p, NamedTag $nbt, ?\Closure $onsave) : InspectSession;
 	/**
 	 * Automatically applys the NBT to the target item / entity when it has changes
 	*/

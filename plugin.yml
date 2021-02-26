@@ -3,7 +3,7 @@ author: Endermanbugzjfc
 # api: 3.11.2 # InvMenu v3 minimum api version
 api: 3.2.0 # FormAPI minimun api version
 version: 1.0.0
-# main: Endermanbugzjfc\NBTInspect\NBTInspect
+main: Endermanbugzjfc\NBTInspect\NBTInspect
 description: A in-game NBT editing / debugging tool!
 # Let people know where this plugin is from if they download from some random weird place
 # (For example YouTube)
@@ -28,10 +28,10 @@ permissions:
             description: 'Permission to inspect the NBT data of an item'
           nbtinspect.cmd.entity:
             default: op
-            description: 'Permission to inspect the NBT data of an entity' 
+            description: 'Permission to inspect the NBT data of an entity or player data of a player' 
           nbtinspect.cmd.level:
             default: op
-            description: 'Permission to inspect the NBT data of a loaded level' 
+            description: 'Permission to inspect the NBT data of a level' 
           nbtinspect.cmd.tile:
             default: op
             description: 'Permission to inspect the NBT data of a tile' 
