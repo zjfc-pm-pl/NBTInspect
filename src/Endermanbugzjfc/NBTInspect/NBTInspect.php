@@ -31,13 +31,12 @@ use pocketmine\{
 	command\Command,
 	command\CommandSender,
 	utils\TextFormat as TF,
-	event\Listener,
 	plugin\PluginBase
 };
 use pocketmine\event\{
 	Listener,
 	player\PlayerQuitEvent
-}
+};
 
 use jojoe77777\FormAPI\ModalForm;
 // use muqsit\invmenu\{InvMenu, InvMenuHandler};
@@ -51,19 +50,23 @@ use Endermanbugzjfc\NBTInspect\{
 use function is_a;
 use function strtolower;
 
-final class NBTInspect extends PluginBase implements Listener, API{
 
 	public const UI_DEFAULT = FormUI::class;
+class NBTInspect extends PluginBase implements Listener, API{
 
 	protected $players = [];
 	protected $uis = [];
 
 	private static $instance = null;
 
-	public function onEnable() : void {
+	public function onLoad() : void {
 		self::$instance = $this;
+	}
+
+	public function onEnable() : void {
 		// if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		$this->getLogger()->warning('This plugin should only be use as a developer, there is a risk of corrupting the data or break your server by modificating the data arbitrarily!');
 	}
 
 	public function onPlayerQuit(PlayerQuitEvent $ev) : void {
@@ -84,41 +87,28 @@ final class NBTInspect extends PluginBase implements Listener, API{
 
 	public static function inspectItem(Player $p, Item $item) : InspectSession {
 		return $this->inspect($p, $item->getNamedTag(), function(NamedTag $nbt) use ($item) : void {
-			self::disclaimerScreen($p, function(Player $p, $data = false) {
-				if (!$data) return;
-				if (!$item instanceof Item) return;
-				$item->setNamedTag($nbt);
-			});
+			if (!$data) return;
+			if (!$item instanceof Item) return;
+			$item->setNamedTag($nbt);
 		});
 	}
 
 	public static function inspectEntity(Player $p, Entity $entity) : InspectSession {
 		return $this->inspect($p, $entity->namedtag, function(NamedTag $nbt) use ($entity) : void {
-			self::disclaimerScreen($p, function(Player $p, $data = false) {
-				if (!$data) return;
-				if (!$entity instanceof Entity) return;
-				$entity->namedtag = $nbt;
-			});
+			if (!$data) return;
+			if (!$entity instanceof Entity) return;
+			$entity->namedtag = $nbt;
 		});
 	}
 
 	public static function inspectLevel(Player $p, Level $w) : ?InspectSession {
-		if ($w->getProvider() !== $w->)
+		if (is_a($w->getProvider(), BaseLevelProvider::class, true))
 		return $this->inspect($p, $w->getProvider()->getLevelData(), function(NamedTag $nbt) use ($w) : void {
 			if (!$w instanceof Level) return;
 			$reflect = new \ReflectionProperty($w, 'levelData');
 			$reflect->setAccessible(true);
 			$reflect->setValue($reflect->class, $nbt);
 		});
-	}
-
-	private static function disclaimerScreen(Player $p, \Closure $callback) : ModalForm {
-		$f = ModalForm($callback);
-		$f->addTitle(TF::BOLD . TF::BLUE . '>> ' . TF::DARK_AQUA . '!WARNING!' . TF::BLUE . ' <<');
-		$f->setContent(TF::YELLOW . 'This plugin should only be use for ' . TF::BOLD . 'debugging and ' . TF::RED . 'have a chance to break your server or corrupt your world files!');
-		$f->setButton1(TF::BLUE . 'Continue');
-		$f->setButton2(TF::DARK_AQUA . 'Back');
-		$p->sendForm($f);
 	}
 
 	public function switchPlayerUI(Player $p, UIInterface $ui) {
@@ -156,7 +146,7 @@ final class NBTInspect extends PluginBase implements Listener, API{
 			case 'help':
 				$cmdl[] = 'help' . TF::ITALIC . TF::GRAY . ' (Display NBTInspect plugin command usage)';
 
-				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot]'; . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
+				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
 
 				if ($p->hasPermission('nbtinspect.cmd.entity')) $cmdl[] = 'entity [Entity ID]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity or the player data of a player)';
 
@@ -164,7 +154,7 @@ final class NBTInspect extends PluginBase implements Listener, API{
 
 				if ($p->hasPermission('nbtinspect.cmd.tile')) $cmdl[] = 'tile <xyz>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a tile by XYZ)';
 
-				$p->sendMessage(TF::BOLD . GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
+				$p->sendMessage(TF::BOLD . TF::GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
 				break;
 
 			case 'item':
@@ -196,8 +186,7 @@ final class NBTInspect extends PluginBase implements Listener, API{
 				$slfn = $args[1];
 				if ($level = $this->getServer()->getLevel($slfn) === null) {
 					$this->getLevelData($slfn, function(?CompoundTag $nbt) : void {
-						if ($nbt === null) $p->sendMessage(TF::BOLD . TF::RED . 'Level not dosen\'t exist or not loaded!')
-
+						if ($nbt === null) $p->sendMessage(TF::BOLD . TF::RED . 'Target level file cannot be load!');
 							$this->inspect($p, $nbt, function(?NamedTag $nbt) use ($slfn) : void {
 							$this->setPlayerData($slfn, $nbt);
 						});

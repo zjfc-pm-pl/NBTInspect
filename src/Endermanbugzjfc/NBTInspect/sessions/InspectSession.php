@@ -34,9 +34,25 @@ use function array_shift;
 class InspectSession {
 
 	private $player;
+
+	/**
+	 * @var NamedTag[]
+	 */
 	private $tag = [];
+
+	/**
+	 * @var \Closure|null
+	 */
 	private $onsave = null;
+
+	/**
+	 * @var UIInterface
+	 */
 	private $ui;
+
+	/**
+	 * @var NamedTag
+	 */
 	private $origin = null;
 	
 	public function __construct(Player $player, NamedTag $tag = null, callable $onsave = null) {
@@ -47,6 +63,19 @@ class InspectSession {
 
 	public function getPlayer() : Player {
 		return $this->player;
+	}
+
+	/**
+	 * @var string
+	 */
+	private $target;
+
+	public function setTarget(string $target) : void {
+		$this->target = $target;
+	}
+
+	public function getTarget() : string {
+		return $this->target;
 	}
 
 	public function getRootTag() : ?NamedTag {
