@@ -148,7 +148,8 @@ class NBTInspect extends PluginBase implements Listener, API{
 
 				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
 
-				if ($p->hasPermission('nbtinspect.cmd.entity')) $cmdl[] = 'entity [Entity ID]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity or the player data of a player)';
+				if ($p->hasPermission('nbtinspect.cmd.entity')) $cmdl[] = 'entity [Entity ID|Play
+				er name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity or the player data of a player)';
 
 				if ($p->hasPermission('nbtinspect.cmd.level')) $cmdl[] = 'level [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a level by the level folder name)';
 
@@ -161,9 +162,9 @@ class NBTInspect extends PluginBase implements Listener, API{
 				if (!$p->hasPermission('nbtinspect.cmd.item')) return false;
 				if (isset($args[1])) $item = ($inv = $this->getPlayer()->getInventory())->getItem((int)$args[1]);
 				else $item = $inv->getItemInHand();
+				$item = ($inv = $this->getPlayer()->getInventory())->getItem((int)($args[1] ?? $inv->getHeldItemIndex()));
 				if ($item->getId() === Item::AIR) $p->sendMessage(TF::BOLD . TF::RED . 'The target slot is empty!');
 				else $this->inspectItem($p, $item);
-				break;
 
 			case 'entity':
 				if (!isset($args[1])) $sid = $p->getId();
@@ -179,20 +180,9 @@ class NBTInspect extends PluginBase implements Listener, API{
 				break;
 
 			case 'level':
-				if (!isset($args[1])) {
-					$p->sendMessage(TF::BOLD . TF::RED . 'Please enter a level folder name!');
-					break;
-				}
-				$slfn = $args[1];
-				if ($level = $this->getServer()->getLevel($slfn) === null) {
-					$this->getLevelData($slfn, function(?CompoundTag $nbt) : void {
-						if ($nbt === null) $p->sendMessage(TF::BOLD . TF::RED . 'Target level file cannot be load!');
-							$this->inspect($p, $nbt, function(?NamedTag $nbt) use ($slfn) : void {
-							$this->setPlayerData($slfn, $nbt);
-						});
-					});
-				}
-				else $this->inspectLevel($p, $level);
+				if (!isset($args[1])) $level = $p->getLevel();
+				else (($level = $this->getServer()->getLevel($args[1])) === null) $p->sendMessage(TF::BOLD . TF::RED . 'Level dosen\'t exist or is not loaded!');
+				if (isset($level)) $this->inspectLevel($p, $level);
 				break;
 		}
 		return true;
