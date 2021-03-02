@@ -28,16 +28,15 @@ use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 interface API {
 	
 	/**
-	 * Description
 	 * @param InspectSession $session
 	 * @param NamedTag $nbt
 	 * @param ?\Closure $onsave A closure instance that is compatible with <code>function(<@link NamedTag> $nbt)</code>
 	 * @return mixed
 	 */
 	public static function inspect(InspectSession $session, NamedTag $nbt, ?\Closure $onsave);
-	/**
-	 * Automatically applys the NBT to the target item / entity when it has changes
-	*/
+	/*
+	 * Auto automatically creates a callback base on the called function
+	 * */
 	public static function inspectItem(InspectSession $session, Item $item);
 	public static function inspectEntity(InspectSession $session, Entity $entity);
 	public static function inspectLevel(InspectSession $session, Level $entity) : bool;
@@ -50,7 +49,7 @@ interface API {
 	/**
 	 * @return string $ui Class name of UI that the player is using
 	*/
-	public function getUserUI(CommandSender $user) : string;
+	public function getUserUI(CommandSender $user) : ?string;
 
 	/**
 	 * @param string $ui Class name of a class that implements UIInterface

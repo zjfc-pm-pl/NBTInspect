@@ -21,7 +21,8 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{nbt\tag\CompoundTag,
+use pocketmine\{command\ConsoleCommandSender,
+    nbt\tag\CompoundTag,
     Player,
     nbt\tag\NamedTag,
     item\Item,
@@ -135,13 +136,16 @@ class NBTInspect extends PluginBase implements Listener, API{
 		return true;
 	}
 
-	public function switchUserUI(CommandSender $user, string $ui) {
-		$this->userpreferences[$user->getId()] = $ui;
-		return $this;
+	public function switchUserUI(CommandSender $user, string $ui) : bool {
+	    if ($user instanceof ConsoleCommandSender) $this->consolepreferences = $ui;
+		elseif ($user instanceof Player) $this->userpreferences[$user->getId()] = $ui;
+		return $user instanceof ConsoleCommandSender or $user instanceof Player;
 	}
 
-	public function getUserUI(CommandSender $user) : string {
-		return $this->userpreferences[$user->getId()] ?? self::UI_DEFAULT;
+	public function getUserUI(CommandSender $user) : ?string {
+	    if ($user instanceof ConsoleCommandSender) return $this->consolepreferences;
+		elseif ($user instanceof Player) return $this->userpreferences[$user->getId()] ?? self::UI_DEFAULT;
+		return null;
 	}
 
 	public function registerUI(string $ui) : void {
@@ -192,26 +196,34 @@ class NBTInspect extends PluginBase implements Listener, API{
 				if (!$p->hasPermission('nbtinspect.cmd.item')) return false;
 				$item = ($inv = $p->getInventory())->getItem((int)($args[1] ?? $inv->getHeldItemIndex()));
 				if ($item->getId() === Item::AIR) $p->sendMessage(TF::BOLD . TF::RED . 'The target slot is empty!');
-				else $this->inspectItem($p, $item);
+				else $this->inspectItem(new InspectSession($p), $item);
                 break;
 
             case 'entity':
+                if ($this->consolepreferences = null) {
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game!');
+					break;
+                }
 				if (!isset($args[1]) and $p instanceof Player) $sid = $p->getId();
 				else $sid = $args[1];
-				if (empty(preg_replace('/[0-9]+/i', '', $sid))) if ($entity = $this->getServer()->findEntity((int)$sid) === null or $entity = $this->getServer()->getPlayer($sid)) $this->getPlayerData($sid, function(?CompoundTag $nbt) use ($sid, $p) : void {
+				if (empty(preg_replace('/[0-9]+/i', '', $sid))) if (($entity = $this->getServer()->findEntity((int)$sid)) === null or $entity = $this->getServer()->getPlayer($sid)) $this->getPlayerData($sid, function(?CompoundTag $nbt) use ($sid, $p) : void {
 					if ($nbt === null) $p->sendMessage(TF::BOLD . TF::RED . 'Player not found!');
-					$this->inspect($p, $nbt, function(?NamedTag $nbt) use ($sid) : void {
+					$this->inspect(new InspectSession($p), $nbt, function(?NamedTag $nbt) use ($sid) : void {
 						$this->setPlayerData($sid, $nbt);
 					});
 				});
-				elseif ($entity = $this->getServer()->findEntity((int)$sid) !== null) $this->inspectEntity($p, $entity);
+				elseif (($entity = $this->getServer()->findEntity((int)$sid)) !== null) $this->inspectEntity(new InspectSession($p), $entity);
 				else $p->sendMessage(TF::BOLD . TF::RED . 'Player not found!');
 				break;
 
 			case 'level':
+			    if ($this->consolepreferences = null) {
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game!');
+					break;
+                }
 				if (!isset($args[1]) and $p instanceof Player) $level = $p->getLevel();
 				elseif (($level = $this->getServer()->getLevel($args[1])) === null) $p->sendMessage(TF::BOLD . TF::RED . 'Level dosen\'t exist or is not loaded!');
-				if (isset($level)) $this->inspectLevel($p, $level);
+				if (isset($level)) $this->inspectLevel(new InspectSession($p), $level);
 				break;
 		}
 		return true;
