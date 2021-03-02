@@ -37,7 +37,7 @@ class FormUI extends BaseUI {
 
 	public function preInspect() {
 		$this->preinspect = NBTInspect::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $ct) : void {
-			$this->getSession()->getPlayer()->sendPopup(TF::YELLOW . 'Loading NBT tag to inspect...');
+			$this->getSession()->getSessionOwner()->sendPopup(TF::YELLOW . ‘Loading NBT tag to inspect...’);
 		}), 40);
 
 		return $this;
@@ -71,7 +71,7 @@ class FormUI extends BaseUI {
 				return new forms\NumbericValueEditForm($this);
 
 			default:
-				throw new \RuntimeException('An invalid tag type has given');
+				throw new \RuntimeException(‘An invalid tag type has given’);
 		}
 		return $this;
 	}

@@ -111,12 +111,12 @@ class NBTInspect extends PluginBase implements Listener, API{
 		});
 	}
 
-	public function switchPlayerUI(Player $p, UIInterface $ui) {
+	public function switchUserUI(Player $p, UIInterface $ui) {
 		$this->players[$p->getId()] = $ui;
 		return $this;
 	}
 
-	public function getPlayerUI(Player $p) : string {
+	public function getUserUI(Player $p) : string {
 		return $this->players[$p->getId()] ?? self::UI_DEFAULT;
 	}
 

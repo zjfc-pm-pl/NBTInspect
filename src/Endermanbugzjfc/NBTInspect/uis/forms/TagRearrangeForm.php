@@ -64,7 +64,7 @@ class TagRearrangeForm extends BaseForm {
 		foreach ($t as $v) if (!in_array($v, $rtl, true)) {
 			$this->illegal = true;
 			$this->setDefautArrangement($rtl);
-			$s->getPlayer()->sendForm($this->form());
+			$s->getSessionOwner()->sendForm($this->form());
 			return;
 		}
 		foreach ($t as $k => $v) $t->remove($k);

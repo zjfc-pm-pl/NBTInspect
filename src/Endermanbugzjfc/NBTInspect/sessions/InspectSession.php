@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use poceketmine\{Player, utils\Utils};
+use poceketmine\{command\CommandSender, utils\Utils};
 use poceketmine\nbt\tag\{CompoundTag, ListTag, NamedTag};
 
 use Endermanbugzjfc\NBTInspect\NBTInspect;
@@ -33,7 +33,7 @@ use function array_shift;
 
 class InspectSession {
 
-	private $player;
+	private $owner;
 
 	/**
 	 * @var NamedTag[]
@@ -55,14 +55,18 @@ class InspectSession {
 	 */
 	private $origin = null;
 	
-	public function __construct(Player $player, NamedTag $tag = null, callable $onsave = null) {
-		$this->player = $player;
+	public function __construct(CommandSender $session_owner, NamedTag $tag = null, callable $onsave = null) {
+		$this->owner = $session_owner;
 		if (isset($onsave)) $this->setOnSaveCallback($onsave);
 		if (isset($tag)) $this->replaceRootTag($tag);
 	}
 
-	public function getPlayer() : Player {
-		return $this->player;
+	public function getSessionOwner() : CommandSender {
+		return $this->owner;
+	}
+	
+	public function getUser() : CommandSender {
+		return $this->getSessionOwner();
 	}
 
 	/**
@@ -186,7 +190,7 @@ class InspectSession {
 
 	public function switchUI() {
 		if (isset($this->ui)) $this->ui->close();
-		$this->ui = NBTInspect::getPlayerUI($this->getPlayer())::create($this);
+		$this->ui = NBTInspect::getUserUI($this->getSessionOwner())::create($this);
 
 		return $this;
 	}

@@ -73,7 +73,7 @@ class NestedTagInspectForm extends BaseForm {
 		if (!isset($data)) {
 			if ($s->getRootTag() === $t) {
 				$f = new ApplyConfirmationForm($this->getUIInstance());
-				$s->getPlayer()->sendForm($f->form());
+				$s->getSessionOwner->sendForm($f->form());
 				return;
 			}
 			$s->closeTag();
@@ -83,13 +83,13 @@ class NestedTagInspectForm extends BaseForm {
 			$data = $data - count($t);
 			switch ($data) {
 				case 0:
-					NBTInspect::getInstance()->switchPlayerUI($this->switchui);
+					NBTInspect::getInstance()->switchUserUI($this->switchui);
 					$s->switchUI();
 					$s->getUIInstance()->inspect();
 					break;
 				
 				case 1:
-					if ($s->getRootTag() === $s->getCurrentTag()) $s->getPlayer()->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
+					if ($s->getRootTag() === $s->getCurrentTag()) $s->getSessionOwner->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
 					else {
 						$s->deleteCurrentTag();
 						$s->inspectCurrentTag();
@@ -97,7 +97,7 @@ class NestedTagInspectForm extends BaseForm {
 					break;
 
 				case 2:
-					if ($t instanceof ListTag) $s->getPlayer()->sendForm((new RearrangeTagForm($this->getUIInstance()->getSession()))->form());
+					if ($t instanceof ListTag) $s->getSessionOwner->sendForm((new RearrangeTagForm($this->getUIInstance()->getSession()))->form());
 					else $s->inspectCurrentTag();
 					break;
 			}

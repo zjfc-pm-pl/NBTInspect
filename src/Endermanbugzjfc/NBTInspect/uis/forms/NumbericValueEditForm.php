@@ -73,7 +73,7 @@ class NumbericValueEditForm extends ValueEditForm {
 			default:
 				if (!Utils::validateNumberValue($t, (int)$data[0])) {
 					$this->invalid = true;
-					$s->getPlayer()->sendForm($this->form());
+					$s->getSessionOwner()->sendForm($this->form());
 					return;
 				}
 				$t->setValue((int)$data[0]);
@@ -81,7 +81,7 @@ class NumbericValueEditForm extends ValueEditForm {
 		}
 		if ($s->getRootTag() === $s->getCurrentTag()) {
 			$f = new ApplyConfirmationForm($this->getUIInstance());
-			$s->getPlayer()->sendForm($f->form());
+			$s->getSessionOwner()->sendForm($f->form());
 			return;
 		}
 		$s->closeTag();

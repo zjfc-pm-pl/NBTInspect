@@ -43,7 +43,7 @@ abstract class BaseForm {
 	public function __construct(FormUI $ui) {
 		$this->ui = $ui;
 		$this->resetForm();
-		$ui->getSession()->getPlayer()->sendForm($this->form());
+		$ui->getSession()->getSessionOwner()->sendForm($this->form());
 	}
 
 	public function preReact(Player $p, $data = null) : void {

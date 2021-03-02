@@ -21,8 +21,6 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\{Player, nbt\tag\NamedTag};
-
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
 interface UIInterface {
