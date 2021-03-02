@@ -21,8 +21,12 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\utils\TextFormat as TF;
-use pocketmine\scheduler\{ClosureTask, TaskHandler};
+use pocketmine\{
+	Player,
+	utils\TextFormat as TF,
+	scheduler\ClosureTask,
+	scheduler\TaskHandler
+};
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
 
 use Endermanbugzjfc\NBTInspect\NBTInspect;
@@ -33,6 +37,10 @@ class FormUI extends BaseUI {
 
 	public static function getName() : string {
 		return 'Form';
+	}
+	
+	public static function accessibleBy(InspectSession $session) : bool {
+		return $session->getSessionOwner() instanceof Player;
 	}
 
 	public function preInspect() {

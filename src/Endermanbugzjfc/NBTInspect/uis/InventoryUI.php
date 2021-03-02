@@ -34,6 +34,10 @@ class InventoryUI extends BaseUI {
 	public static function getName() : string {
 		return 'Inventory';
 	}
+	
+	public static function accessibleBy(InspectSession $session) : bool {
+		return $session->getSessionOwner() instanceof Player;
+	}
 
 	public function preInspect() {
 		/*$this->preinspect = NBTInspect::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $ct) : void {
