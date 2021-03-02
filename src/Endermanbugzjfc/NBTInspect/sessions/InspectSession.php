@@ -19,10 +19,10 @@
 */
 
 declare(strict_types=1);
-namespace Endermanbugzjfc\NBTInspect;
+namespace Endermanbugzjfc\NBTInspect\sessions;
 
-use poceketmine\{command\CommandSender, utils\Utils};
-use poceketmine\nbt\tag\{CompoundTag, ListTag, NamedTag};
+use pocketmine\{command\CommandSender, utils\Utils};
+use pocketmine\nbt\tag\{CompoundTag, ListTag, NamedTag};
 
 use Endermanbugzjfc\NBTInspect\NBTInspect;
 
@@ -90,7 +90,7 @@ class InspectSession {
 		return $this->origin;
 	}
 
-	public function replaceRootTag(NamedTag $tag) {
+	public function setRootTag(NamedTag $tag) {
 		if (count($this->tag) > 1) throw new \InvalidStateException('Please close all the child tags before changing the root tag');
 		$this->origin = clone $tag;
 		$this->tag = [clone $tag];

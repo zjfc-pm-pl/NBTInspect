@@ -21,13 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{
-	Player,
-	nbt\tag\NamedTag,
-	item\Item,
-	entity\Entity,
-	level\Level
-};
+use pocketmine\{command\CommandSender, nbt\tag\NamedTag, item\Item, entity\Entity, level\Level};
 
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
@@ -37,7 +31,7 @@ interface API {
 	 * Description
 	 * @param InspectSession $session
 	 * @param NamedTag $nbt
-	 * @param ?\Closure $onsave A closure isntance that is compatible with <code>function(<@link NamedTag> $nbt)</code>
+	 * @param ?\Closure $onsave A closure instance that is compatible with <code>function(<@link NamedTag> $nbt)</code>
 	 * @return mixed
 	 */
 	public static function inspect(InspectSession $session, NamedTag $nbt, ?\Closure $onsave);
@@ -52,11 +46,11 @@ interface API {
 	 * @param string $ui Class name of UI that the player is using
 	 * @return $this
 	*/
-	public function switchPlayerUI(Player $p, string $ui);
+	public function switchUserUI(CommandSender $user, string $ui);
 	/**
 	 * @return string $ui Class name of UI that the player is using
 	*/
-	public function getPlayerUI(Player $p) : string;
+	public function getUserUI(CommandSender $user) : string;
 
 	/**
 	 * @param string $ui Class name of a class that implements UIInterface
@@ -64,7 +58,7 @@ interface API {
 	public function registerUI(string $ui) : void;
 	/**
 	 * @param string $ui Class name of a class that implements UIInterface
-	 * @return bool Is duplicated registeration
+	 * @return bool Is duplicated registration
 	*/
 	public function unregisterUI(string $ui) : bool;
 	/**
