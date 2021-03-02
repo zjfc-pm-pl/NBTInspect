@@ -21,14 +21,11 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
-use pocketmine\{
-	Player,
-	utils\TextFormat as TF
-};
+use pocketmine\Player;
 
 use jojoe77777\FormAPI\{Form, CustomForm, SimpleForm};
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\FormUI};
+use Endermanbugzjfc\NBTInspect\uis\FormUI;
 
 abstract class BaseForm {
 
@@ -48,7 +45,7 @@ abstract class BaseForm {
 
 	public function preReact(Player $p, $data = null) : void {
 		$this->resetForm();
-		$this->react($react);
+		$this->react($data);
 	}
 	
 	abstract protected function react($data = null) : void;
@@ -63,5 +60,9 @@ abstract class BaseForm {
 		$this->form = new $type([$this, 'preReact']);
 		return $this;
 	}
+
+	public function getForm() : Form {
+	    return $this->form;
+    }
 
 }

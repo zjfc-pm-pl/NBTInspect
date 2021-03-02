@@ -21,15 +21,17 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\sessions;
 
-use pocketmine\{command\CommandSender, utils\Utils};
+use pocketmine\command\CommandSender;
 use pocketmine\nbt\tag\{CompoundTag, ListTag, NamedTag};
 
 use Endermanbugzjfc\NBTInspect\NBTInspect;
 
+use Endermanbugzjfc\NBTInspect\uis\UIInterface;
 use function array_reverse;
 use function assert;
 use function count;
 use function array_shift;
+use function get_class;
 
 class InspectSession {
 
@@ -58,7 +60,7 @@ class InspectSession {
 	public function __construct(CommandSender $session_owner, NamedTag $tag = null, callable $onsave = null) {
 		$this->owner = $session_owner;
 		if (isset($onsave)) $this->setOnSaveCallback($onsave);
-		if (isset($tag)) $this->replaceRootTag($tag);
+		if (isset($tag)) $this->setRootTag($tag);
 	}
 
 	public function getSessionOwner() : CommandSender {
@@ -106,7 +108,7 @@ class InspectSession {
 	}
 
 	public function saveChanges() {
-		$this->getOnSaveCallable()($this->getRootTag());
+		$this->getOnSaveCallback()($this->getRootTag());
 
 		return $this;
 	}
@@ -116,13 +118,13 @@ class InspectSession {
 	}
 
 	public function deleteCurrentTag() {
-		$c = $this->getCurrentTag();
 		$this->closeTag();
 		$t = $this->getCurrentTag();
+		$tag = $this->getAllOpenedTags()[1];
 		switch (true) {
 			case $t instanceof CompoundTag:
-				if (!$t->hasTag($tag->getName(), $tag::class)) throw new \InvalidArgumentException('Cannot delete the given tag as it is not a child tag of the parent tag');
-				$t->remove($tag->getName());
+				if (!$t->hasTag($tag->getName(), get_class($tag))) throw new \InvalidArgumentException('Cannot delete the given tag as it is not a child tag of the parent tag');
+				$t->removeTag($tag->getName());
 				break;
 
 			case $t instanceof ListTag:
@@ -131,10 +133,9 @@ class InspectSession {
 					break 2;
 				}
 				throw new \InvalidArgumentException('Cannot delete the given tag as it is not a child tag of the parent tag');
-				break;
 			
 			default:
-				assert(false);
+                assert(false);
 				break;
 		}
 		return $this;
@@ -149,8 +150,8 @@ class InspectSession {
 		$t = $this->getCurrentTag();
 		switch (true) {
 			case $t instanceof CompoundTag:
-				if (!$t->hasTag($tag->getName(), $tag::class)) throw new \InvalidArgumentException('Cannot open the given tag as it is not a child tag of the parent tag');
-				$this->tag[] = $tag->getTag($tag->getName(), $tag::class);
+				if (!$t->hasTag($tag->getName(), get_class($tag))) throw new \InvalidArgumentException('Cannot open the given tag as it is not a child tag of the parent tag');
+				$this->tag[] = $tag->getTag($tag->getName(), get_class($tag));
 				break;
 
 			case $t instanceof ListTag:
@@ -159,11 +160,9 @@ class InspectSession {
 					break 2;
 				}
 				throw new \InvalidArgumentException('Cannot open the given tag as it is not a child tag of the parent tag');
-				break;
 			
 			default:
 				throw new \InvalidStateException('You cannot open a child tag when the current tag is not ' . CompoundTag::class . ' or ' . ListTag::class);
-				break;
 		}
 
 		return $this;
@@ -178,9 +177,11 @@ class InspectSession {
 		return $this;
 	}
 
-	public function inspectCurrentTag() : UIInterface {
-		if (!isset($this->getRootTag())) $this->getUIInstance()->preInspect();
+	public function inspectCurrentTag() {
+		if ($this->getRootTag() === null) $this->getUIInstance()->preInspect();
 		else $this->getUIInstance()->inspect($this->getCurrentTag());
+
+		return $this;
 	}
 
 	public function getUIInstance() : UIInterface {
@@ -190,15 +191,17 @@ class InspectSession {
 
 	public function switchUI() {
 		if (isset($this->ui)) $this->ui->close();
-		$this->ui = NBTInspect::getUserUI($this->getSessionOwner())::create($this);
+		$ui = NBTInspect::getInstance()->$this->getSessionOwner();
+		assert($ui instanceof UIInterface);
+		if ($ui instanceof UIInterface) $this->ui = $ui::create($this);
 
 		return $this;
 	}
 
 	public function backToRootTag() : bool {
-		assert($this->getRootTag() instanceof NamedTag);
+		if (!$this->getRootTag() instanceof NamedTag) return false;
 		$this->tag = [$this->getRootTag()];
-		return $this;
+		return true;
 	}
 	
 	public function getOnSaveCallback() : ?\Closure {
@@ -206,7 +209,6 @@ class InspectSession {
 	}
 
 	public function setOnSaveCallback(\Closure $onsave) {
-		Utils::validateCallableSignaure(function(NamedTag $edited) {}, $onsave);
 		$this->onsave = $onsave;
 
 		return $this;

@@ -27,9 +27,23 @@ use pocketmine\{
 	scheduler\ClosureTask,
 	scheduler\TaskHandler
 };
-use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};
+use pocketmine\nbt\tag\{CompoundTag,
+    ByteTag,
+    ShortTag,
+    IntTag,
+    LongTag,
+    FloatTag,
+    DoubleTag,
+    StringTag,
+    ByteArrayTag,
+    IntArrayTag,
+    ListTag
+};
 
-use Endermanbugzjfc\NBTInspect\NBTInspect;
+use Endermanbugzjfc\NBTInspect\{
+    NBTInspect,
+    sessions\InspectSession
+};
 
 class FormUI extends BaseUI {
 
@@ -45,7 +59,7 @@ class FormUI extends BaseUI {
 
 	public function preInspect() {
 		$this->preinspect = NBTInspect::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function(int $ct) : void {
-			$this->getSession()->getSessionOwner()->sendPopup(TF::YELLOW . ‘Loading NBT tag to inspect...’);
+			$this->getSession()->getSessionOwner()->sendPopup(TF::YELLOW . 'Loading NBT tag to inspect...');
 		}), 40);
 
 		return $this;
@@ -53,6 +67,7 @@ class FormUI extends BaseUI {
 
 	public function inspect() {
 		if ($this->preinspect instanceof TaskHandler) $this->preinspect->cancel();
+		$tag = $this->getSession()->getCurrentTag();
 		switch (true) {
 			case $tag instanceof CompoundTag:
 			case $tag instanceof ListTag:
@@ -69,8 +84,9 @@ class FormUI extends BaseUI {
 					$tag->setValue($value);
 					$this->getSession()->inspectCurrentTag();
 				});
+                break;
 
-			case $tag instanceof ByteTag:
+            case $tag instanceof ByteTag:
 			case $tag instanceof ShortTag:
 			case $tag instanceof IntTag:
 			case $tag instanceof LongTag:
@@ -79,7 +95,7 @@ class FormUI extends BaseUI {
 				return new forms\NumbericValueEditForm($this);
 
 			default:
-				throw new \RuntimeException(‘An invalid tag type has given’);
+				throw new \RuntimeException('An invalid tag type has given');
 		}
 		return $this;
 	}

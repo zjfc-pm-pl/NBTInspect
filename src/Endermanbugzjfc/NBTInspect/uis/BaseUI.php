@@ -21,8 +21,6 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\utils\TextFormat as TF;
-
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
 abstract class BaseUI implements UIInterface {
@@ -34,8 +32,8 @@ abstract class BaseUI implements UIInterface {
 		$this->session = $session;
 	}
 
-	public static function create(InspectSession $session, UIInterface $previous = null) : self {
-		$self = new self($session);
+	public static function create(InspectSession $session, UIInterface $previous = null) : UIInterface {
+		$self = new static($session);
 		$self->previous = $previous;
 		return $self;
 	}

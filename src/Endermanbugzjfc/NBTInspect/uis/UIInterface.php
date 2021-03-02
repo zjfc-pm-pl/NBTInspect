@@ -29,8 +29,8 @@ interface UIInterface {
 	public static function create(InspectSession $session, UIInterface $previous = null) : self;
 	public static function accessibleBy(InspectSession $session) : bool;
 
-	public function preInsepct();
-	public function inspepct();
+	public function preInspect();
+	public function inspect();
 	public function close();
 
 	public function getSession() : InspectSession;

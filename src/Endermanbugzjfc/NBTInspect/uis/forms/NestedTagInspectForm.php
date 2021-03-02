@@ -21,15 +21,19 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\NamedTag;
 use pocketmine\utils\TextFormat as TF;
 
 use jojoe77777\FormAPI\Form;
 
-use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface, uis\InventoryUI};
+use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface, Utils};
 
+use function array_filter;
+use function assert;
 use function implode;
 use function array_map;
-use function array_search;
 
 class NestedTagInspectForm extends BaseForm {
 
@@ -41,6 +45,7 @@ class NestedTagInspectForm extends BaseForm {
 	protected function form() : Form {
 		$f = $this->getForm();
 		$s = $this->getUIInstance()->getSession();
+		$t = $s->getCurrentTag();
 
 		$f->setTitle(TF::BLUE . 'Browse ' . TF::DARK_AQUA . 'Tag');
 
@@ -50,19 +55,20 @@ class NestedTagInspectForm extends BaseForm {
 
 		foreach ($t->getValue() as $k => $st) {
 			$this->buttons[] = $st;
-			if ($t instanceof CompoundTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::getTagType($st) . ‘ Tag’);
-			else $this->getForm()->addButton(TF::BLUE . ‘Tag’ . “\n” . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
+			if ($t instanceof CompoundTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . $st->getName() . "\n" . TF::RESET . Utils::getTagType($st) . ' Tag');
+			else $this->getForm()->addButton(TF::BLUE . 'Tag' . "\n" . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
 		}
 
-		if (($pui = $s->getPreviousUI()) instanceof UIInterface) {
-			if (($r = array_search($pui::class, $uis = NBTInspect::getInstance()->getAllUI())) !== false) unset($uis[$r]);
-			$ui = $uis[array_rand($uis)];
-		} else $ui = InventoryUI::class;
+        $uis = array_filter(NBTInspect::getInstance()->getAllUI(), function(string $ui) : bool {
+           return $ui instanceof UIInterface and $this->getUIInstance()::getName() !== $ui::getName();
+        });
+		if (empty($uis)) $ui = NBTInspect::UI_DEFAULT;
+        else $ui = $uis[array_rand($uis)];
 		$this->switchui = $ui;
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . ‘Switch UI’ . TF::RESET . “\n” . TF::BLUE . ‘To ‘ . TF::BOLD . $ui::getName());
-		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . “Delete\nThis Tag”);
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_GRREEN . “Insert\nNew Tag”);
-		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . “Rearrange\nTags”);
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
+		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . "Delete\nThis Tag");
+		$this->getForm()->addButton(TF::BOLD . TF::DARK_GREEN . "Insert\nNew Tag");
+		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . "Rearrange\nTags");
 
 		return $f;
 	}
@@ -70,10 +76,11 @@ class NestedTagInspectForm extends BaseForm {
 	protected function react($data = null) : void {
 		$s = $this->getUIInstance()->getSession();
 		$t = $s->getCurrentTag();
+		assert($t instanceof CompoundTag or $t instanceof ListTag);
 		if (!isset($data)) {
 			if ($s->getRootTag() === $t) {
-				$f = new ApplyConfirmationForm($this->getUIInstance());
-				$s->getSessionOwner->sendForm($f->form());
+				$f = new SaveConfirmationForm($this->getUIInstance());
+				$s->getSessionOwner()->sendForm($f->form());
 				return;
 			}
 			$s->closeTag();
@@ -83,13 +90,13 @@ class NestedTagInspectForm extends BaseForm {
 			$data = $data - count($t);
 			switch ($data) {
 				case 0:
-					NBTInspect::getInstance()->switchUserUI($this->switchui);
+					NBTInspect::getInstance()->switchUserUI($this->getUIInstance()->getSession()->getSessionOwner(), $this->switchui);
 					$s->switchUI();
 					$s->getUIInstance()->inspect();
 					break;
 				
 				case 1:
-					if ($s->getRootTag() === $s->getCurrentTag()) $s->getSessionOwner->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
+					if ($s->getRootTag() === $s->getCurrentTag()) $s->getSessionOwner()->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
 					else {
 						$s->deleteCurrentTag();
 						$s->inspectCurrentTag();
@@ -97,7 +104,7 @@ class NestedTagInspectForm extends BaseForm {
 					break;
 
 				case 2:
-					if ($t instanceof ListTag) $s->getSessionOwner->sendForm((new RearrangeTagForm($this->getUIInstance()->getSession()))->form());
+					if ($t instanceof ListTag) $s->getSessionOwner()->sendForm((new TagRearrangeForm($this->getUIInstance()->getSession()))->form());
 					else $s->inspectCurrentTag();
 					break;
 			}

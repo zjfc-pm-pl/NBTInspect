@@ -21,7 +21,10 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
-use pocketmine\utils\TextFormat as TF;
+use pocketmine\{
+    utils\TextFormat as TF,
+    nbt\tag\NamedTag
+};
 
 use jojoe77777\FormAPI\Form;
 
@@ -29,7 +32,7 @@ use Endermanbugzjfc\NBTInspect\Utils;
 
 use function array_map;
 
-abstract class NestedTagInspectForm extends BaseForm {
+abstract class ValueEditForm extends BaseForm {
 
 	protected const TYPE = self::CUSTOM;
 	

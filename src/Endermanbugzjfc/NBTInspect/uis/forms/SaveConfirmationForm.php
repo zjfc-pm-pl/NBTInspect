@@ -19,7 +19,7 @@
 */
 
 declare(strict_types=1);
-namespace Endermanbugzjfc\NBTInspect\uis\fomrs;
+namespace Endermanbugzjfc\NBTInspect\uis\forms;
 
 use pocketmine\utils\TextFormat as TF;
 

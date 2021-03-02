@@ -32,7 +32,7 @@ use function array_shift;
 
 class NumbericValueEditForm extends ValueEditForm {
 
-	private $invalid = falses;
+	private $invalid = false;
 	
 	protected function form() : Form {
 		$f = parent::form();
@@ -80,7 +80,7 @@ class NumbericValueEditForm extends ValueEditForm {
 				break;
 		}
 		if ($s->getRootTag() === $s->getCurrentTag()) {
-			$f = new ApplyConfirmationForm($this->getUIInstance());
+			$f = new SaveConfirmationForm($this->getUIInstance());
 			$s->getSessionOwner()->sendForm($f->form());
 			return;
 		}

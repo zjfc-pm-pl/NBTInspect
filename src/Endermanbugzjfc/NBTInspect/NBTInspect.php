@@ -151,8 +151,8 @@ class NBTInspect extends PluginBase implements Listener, API{
 	public function registerUI(string $ui) : void {
 		if (!is_a($ui, UIInterface::class, true)) throw new \InvalidArgumentException('Argument 1 must be a namespace of a class that implements UIInterface');
 		foreach ($this->uis as $rui) {
-		    assert(is_a($rui, UIInterface::class));
-		    if (is_a($rui, UIInterface::class) and $ui::getName() === $rui::getName()) throw new \InvalidArgumentException('Theres is already an registered UI having the same name!');
+		    assert(is_a($rui, UIInterface::class, true));
+		    if (is_a($rui, UIInterface::class, true) and $ui::getName() === $rui::getName()) throw new \InvalidArgumentException('Theres is already an registered UI having the same name!');
         }
 		$this->uis[] = $ui;
 	}
