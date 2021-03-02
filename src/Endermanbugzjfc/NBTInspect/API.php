@@ -35,18 +35,18 @@ interface API {
 	
 	/**
 	 * Description
-	 * @param Player $p 
+	 * @param InspectSession $session
 	 * @param NamedTag $nbt
 	 * @param ?\Closure $onsave A closure isntance that is compatible with <code>function(<@link NamedTag> $nbt)</code>
-	 * @return InspectSession
+	 * @return mixed
 	 */
-	public function inspect(Player $p, NamedTag $nbt, ?\Closure $onsave) : InspectSession;
+	public static function inspect(InspectSession $session, NamedTag $nbt, ?\Closure $onsave);
 	/**
 	 * Automatically applys the NBT to the target item / entity when it has changes
 	*/
-	public static function inspectItem(Player $p, Item $item) : InspectSession;
-	public static function inspectEntity(Player $p, Entity $entity) : InspectSession;
-	public static function inspectLevel(Player $p, Level $entity) : InspectSession;
+	public static function inspectItem(InspectSession $session, Item $item);
+	public static function inspectEntity(InspectSession $session, Entity $entity);
+	public static function inspectLevel(InspectSession $session, Level $entity) : bool;
 
 	/**
 	 * @param string $ui Class name of UI that the player is using
