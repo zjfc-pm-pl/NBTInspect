@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
-use pocketmine\{Player, utils\TextFormat as TF};
+use pocketmine\{command\CommandSender, Player, utils\TextFormat as TF};
 /*use pocketmine\scheduler\{ClosureTask, TaskHandler};
 use pocketmine\nbt\tag\{NamedTag, CompoundTag, ByteTag, ShortTag, IntTag, LongTag, FloatTag, DoubleTag, StringTag, ByteArrayTag, IntArrayTag};*/
 
@@ -35,8 +35,8 @@ class InventoryUI extends BaseUI {
 		return 'Inventory';
 	}
 	
-	public static function accessibleBy(InspectSession $session) : bool {
-		return $session->getSessionOwner() instanceof Player;
+	public static function accessibleBy(CommandSender $user) : bool {
+		return $user instanceof Player;
 	}
 
 	public function preInspect() {

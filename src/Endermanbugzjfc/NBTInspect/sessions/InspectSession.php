@@ -136,8 +136,7 @@ class InspectSession {
 			
 			default:
                 assert(false);
-				break;
-		}
+        }
 		return $this;
 	}
 
@@ -179,7 +178,7 @@ class InspectSession {
 
 	public function inspectCurrentTag() {
 		if ($this->getRootTag() === null) $this->getUIInstance()->preInspect();
-		else $this->getUIInstance()->inspect($this->getCurrentTag());
+		else $this->getUIInstance()->inspect();
 
 		return $this;
 	}
@@ -191,7 +190,7 @@ class InspectSession {
 
 	public function switchUI() {
 		if (isset($this->ui)) $this->ui->close();
-		$ui = NBTInspect::getInstance()->$this->getSessionOwner();
+		$ui = NBTInspect::getInstance()->getUserUI(NBTInspect::getInstance()->$this->getSessionOwner());
 		assert($ui instanceof UIInterface);
 		if ($ui instanceof UIInterface) $this->ui = $ui::create($this);
 
@@ -213,5 +212,4 @@ class InspectSession {
 
 		return $this;
 	}
-
 }

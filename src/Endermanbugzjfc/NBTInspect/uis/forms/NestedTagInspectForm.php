@@ -30,7 +30,6 @@ use jojoe77777\FormAPI\Form;
 
 use Endermanbugzjfc\NBTInspect\{NBTInspect, uis\UIInterface, Utils};
 
-use function array_filter;
 use function assert;
 use function implode;
 use function array_map;
@@ -59,13 +58,7 @@ class NestedTagInspectForm extends BaseForm {
 			else $this->getForm()->addButton(TF::BLUE . 'Tag' . "\n" . TF::BOLD . TF::DARK_AQUA . TF::BLUE . $k);
 		}
 
-        $uis = array_filter(NBTInspect::getInstance()->getAllUI(), function(string $ui) : bool {
-           return $ui instanceof UIInterface and $this->getUIInstance()::getName() !== $ui::getName();
-        });
-		if (empty($uis)) $ui = NBTInspect::UI_DEFAULT;
-        else $ui = $uis[array_rand($uis)];
-		$this->switchui = $ui;
-		$this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
+		if (($ui = $this->getUIInstance()->getNextAvailableUI()) !== null and is_a($ui, UIInterface::class, true)) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . 'Switch UI' . TF::RESET . "\n" . TF::BLUE . 'To ' . TF::BOLD . $ui::getName());
 		if ($s->getRootTag() !== $s->getCurrentTag()) $this->getForm()->addButton(TF::BOLD . TF::DARK_RED . "Delete\nThis Tag");
 		$this->getForm()->addButton(TF::BOLD . TF::DARK_GREEN . "Insert\nNew Tag");
 		if ($t instanceof ListTag) $this->getForm()->addButton(TF::BOLD . TF::DARK_AQUA . "Rearrange\nTags");

@@ -21,9 +21,11 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{command\ConsoleCommandSender,
-    nbt\tag\CompoundTag,
+use pocketmine\{
     Player,
+    inventory\InventoryHolder,
+    inventory\PlayerInventory,
+    nbt\tag\CompoundTag,
     nbt\tag\NamedTag,
     item\Item,
     entity\Entity,
@@ -31,8 +33,10 @@ use pocketmine\{command\ConsoleCommandSender,
     level\format\io\BaseLevelProvider,
     command\Command,
     command\CommandSender,
+    command\ConsoleCommandSender,
     utils\TextFormat as TF,
-    plugin\PluginBase};
+    plugin\PluginBase
+};
 use pocketmine\event\{
 	Listener,
 	player\PlayerQuitEvent
@@ -79,7 +83,7 @@ class NBTInspect extends PluginBase implements Listener, API{
 	public function onEnable() : void {
 		// if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		$this->getLogger()->warning('This plugin should only be use as a developer tool, there is a risk of corrupting the data or break your server by modificating the data arbitrarily! (Consider giving developer read-only permission if you decide to put this on production server)');
+		$this->getLogger()->warning('This plugin should only be use as a developer tool, there is a risk of corrupting the data or break your server by modifying the data arbitrarily! (Consider giving developer read-only permission if you decide to put this on production server)');
 	}
 
 	public function onPlayerQuit(PlayerQuitEvent $ev) : void {
@@ -155,6 +159,8 @@ class NBTInspect extends PluginBase implements Listener, API{
 		    if (is_a($rui, UIInterface::class, true) and $ui::getName() === $rui::getName()) throw new \InvalidArgumentException('Theres is already an registered UI having the same name!');
         }
 		$this->uis[] = $ui;
+
+		if ($this->consolepreferences = null and $ui::accessibleBy(new ConsoleCommandSender)) $this->consolepreferences = $ui;
 	}
 
 	public function unregisterUI(string $ui) : bool {

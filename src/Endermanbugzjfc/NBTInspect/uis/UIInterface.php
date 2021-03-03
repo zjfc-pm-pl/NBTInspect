@@ -21,13 +21,15 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect\uis;
 
+use pocketmine\command\CommandSender;
+
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
 interface UIInterface {
 	
 	public static function getName() : string;
 	public static function create(InspectSession $session, UIInterface $previous = null) : self;
-	public static function accessibleBy(InspectSession $session) : bool;
+	public static function accessibleBy(CommandSender $session) : bool;
 
 	public function preInspect();
 	public function inspect();
