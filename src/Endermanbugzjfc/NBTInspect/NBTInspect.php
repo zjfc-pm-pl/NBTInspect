@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{
+use pocketmine\{level\Position,
     Player,
     inventory\InventoryHolder,
     inventory\PlayerInventory,
@@ -34,9 +34,9 @@ use pocketmine\{
     command\Command,
     command\CommandSender,
     command\ConsoleCommandSender,
+    tile\Tile,
     utils\TextFormat as TF,
-    plugin\PluginBase
-};
+    plugin\PluginBase};
 use pocketmine\event\{
 	Listener,
 	player\PlayerQuitEvent
@@ -140,6 +140,20 @@ class NBTInspect extends PluginBase implements Listener, API{
 		return true;
 	}
 
+	public static function inspectTile(InspectSession $session, Tile $tile) : bool {
+	    if (($nbt = $tile->getCleanedNBT()) === null) return false;
+	    self::inspect($session, $nbt, function(CompoundTag $nbt) use ($tile) : void {
+	        $reflect = new \ReflectionMethod($tile, 'readSaveData');
+	        $reflect->setAccessible(true);
+	        $reflect->getClosure($tile)($nbt);
+	        /**
+             * @todo Not sure if this will work or not, think I should re-create a new tile instance and put into the chunk tile list, instead of calling readSaveData() on an tile instance that is already initialized
+             * @see TIle::readSaveData()
+             */
+        });
+		return true;
+	}
+
 	public function switchUserUI(CommandSender $user, string $ui) : bool {
 	    if ($user instanceof ConsoleCommandSender) $this->consolepreferences = $ui;
 		elseif ($user instanceof Player) $this->userpreferences[$user->getId()] = $ui;
@@ -182,32 +196,47 @@ class NBTInspect extends PluginBase implements Listener, API{
 			case 'help':
 				$cmdl[] = 'help' . TF::ITALIC . TF::GRAY . ' (Display NBTInspect plugin command usage)';
 
-				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
+				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot] [Entity ID]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
 
 				if ($p->hasPermission('nbtinspect.cmd.entity')) $cmdl[] = 'entity [Entity ID|Play
 				er name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity or the player data of a player)';
 
 				if ($p->hasPermission('nbtinspect.cmd.level')) $cmdl[] = 'level [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a level by the level folder name)';
 
-				if ($p->hasPermission('nbtinspect.cmd.tile')) $cmdl[] = 'tile <xyz>' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a tile by XYZ)';
+				if ($p->hasPermission('nbtinspect.cmd.tile')) $cmdl[] = 'tile [xyz] [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a tile by XYZ)';
 
 				$p->sendMessage(TF::BOLD . TF::GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
 				break;
 
 			case 'item':
-				if (!$p instanceof Player) {
-					$p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game!');
+				if ($this->consolepreferences = null) {
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game unless a suitable UI type is registered!');
 					break;
-				}
+                }
 				if (!$p->hasPermission('nbtinspect.cmd.item')) return false;
-				$item = ($inv = $p->getInventory())->getItem((int)($args[1] ?? $inv->getHeldItemIndex()));
+				if (!isset($args[2])) {
+				   if ($p instanceof InventoryHolder) $inv = $p->getInventory();
+				   else {
+				       $p->sendMessage(TF::BOLD . TF::RED . 'Please enter an entity ID!');
+				       break;
+                   }
+                } elseif (!($se = $this->getServer()->findEntity((int)$args[2])) instanceof InventoryHolder) {
+				    $p->sendMessage(TF::BOLD . TF::RED . 'Entity with the ID doesn\'t exists or has no inventory!');
+				    break;
+                } else $inv = $se->getInventory();
+				if (!isset($args[1]) and $inv instanceof PlayerInventory) $slot = $inv->getHeldItemIndex();
+				else {
+				    $p->sendMessage(TF::BOLD . TF::RED . 'Please enter a invalid slot number start from 0!');
+				    break;
+                }
+				$item = $inv->getItem($slot);
 				if ($item->getId() === Item::AIR) $p->sendMessage(TF::BOLD . TF::RED . 'The target slot is empty!');
 				else $this->inspectItem(new InspectSession($p), $item);
                 break;
 
             case 'entity':
                 if ($this->consolepreferences = null) {
-                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game!');
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game unless a suitable UI type is registered!');
 					break;
                 }
 				if (!isset($args[1]) and $p instanceof Player) $sid = $p->getId();
@@ -224,13 +253,41 @@ class NBTInspect extends PluginBase implements Listener, API{
 
 			case 'level':
 			    if ($this->consolepreferences = null) {
-                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game!');
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game unless a suitable UI type is registered!');
 					break;
                 }
-				if (!isset($args[1]) and $p instanceof Player) $level = $p->getLevel();
-				elseif (($level = $this->getServer()->getLevel($args[1])) === null) $p->sendMessage(TF::BOLD . TF::RED . 'Level dosen\'t exist or is not loaded!');
-				if (isset($level)) $this->inspectLevel(new InspectSession($p), $level);
+			    if (isset($args[1])) {
+			        if (($level = $this->getServer()->getLevelByName($args[1])) === null) {
+			            $p->sendMessage(TF::BOLD . TF::RED . 'Level dosen\'t exist or is not loaded!');
+			            break;
+                    }
+                } elseif ($p instanceof Position) $level = $p->getLevel();
+			    else {
+			        $p->sendMessage(TF::BOLD . TF::RED . 'Please enter a level folder name!');
+			        break;
+                }
+				if ($this->inspectLevel(new InspectSession($p), $level)) $p->sendMessage(TF::BOLD . TF::RED . 'Target level has an unsupported level provider type!');
 				break;
+
+            case 'tile':
+			    if ($this->consolepreferences = null) {
+                    $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game unless a suitable UI type is registered!');
+					break;
+                }
+			    if (isset($args[4])) {
+			        if (($level = $this->getServer()->getLevelByName($args[4])) === null) {
+			            $p->sendMessage(TF::BOLD . TF::RED . 'Level dosen\'t exist or is not loaded!');
+			            break;
+                    }
+                } elseif ($p instanceof Position) $level = $p->getLevel();
+			    else {
+			        $p->sendMessage(TF::BOLD . TF::RED . 'Please enter a level folder name!');
+			        break;
+                }
+			    if (isset($args[1]) and isset ($args[2]) and isset($args[3])) $vec = new Position((int)$args[1], (int)$args[2], (int)$args[3], $level);
+			    $tile = $level->getTile($vec ?? $p->asPosition());
+				if (!$this->inspectTile(new InspectSession($p), $tile)) $p->sendMessage(TF::BOLD . TF::RED . 'Failed to read tile NBT data!');
+			    break;
 		}
 		return true;
 	}

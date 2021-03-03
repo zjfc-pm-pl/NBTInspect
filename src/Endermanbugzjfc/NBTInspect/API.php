@@ -21,7 +21,7 @@
 declare(strict_types=1);
 namespace Endermanbugzjfc\NBTInspect;
 
-use pocketmine\{command\CommandSender, nbt\tag\NamedTag, item\Item, entity\Entity, level\Level};
+use pocketmine\{command\CommandSender, nbt\tag\NamedTag, item\Item, entity\Entity, level\Level, tile\Tile};
 
 use Endermanbugzjfc\NBTInspect\sessions\InspectSession;
 
@@ -39,7 +39,14 @@ interface API {
 	 * */
 	public static function inspectItem(InspectSession $session, Item $item);
 	public static function inspectEntity(InspectSession $session, Entity $entity);
-	public static function inspectLevel(InspectSession $session, Level $entity) : bool;
+	/**
+	 * @return bool Whether the given level has a supported level provider or not
+	 */
+	public static function inspectLevel(InspectSession $session, Level $level) : bool;
+	/**
+	 * @return bool Whether the tile NBT data can be successfully read or not
+	 */
+    public static function inspectTile(InspectSession $session, Tile $tile) : bool;
 
 	/**
 	 * @param string $ui Class name of UI that the player is using
