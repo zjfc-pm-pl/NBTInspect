@@ -21,18 +21,21 @@ permissions:
     default: op
     children:
       nbtinspect.cmd:
-        default: op
         children:
-          nbtinspect.cmd.item:
-            default: op
+          nbtinspect.inspect.item.read:
             description: 'Permission to inspect the NBT data of an item'
-          nbtinspect.cmd.entity:
-            default: op
-            description: 'Permission to inspect the NBT data of an entity or player data of a player' 
-          nbtinspect.cmd.level:
-            default: op
-            description: 'Permission to inspect the NBT data of a level' 
-          nbtinspect.cmd.tile:
-            default: op
-            description: 'Permission to inspect the NBT data of a tile' 
+            children:
+              nbtinspect.inspect.item.write: {}
+          nbtinspect.inspect.entity.read:
+            description: 'Permission to inspect the NBT data of an entity or player data of a player'
+            children:
+              nbtinspect.inspect.item.write: {}
+          nbtinspect.inspect.level.read:
+            description: 'Permission to inspect the NBT data of a level'
+            children:
+              nbtinspect.inspect.item.write: {}
+          nbtinspect.inspect.tile.read:
+            description: 'Permission to inspect the NBT data of a tile'
+            children:
+              nbtinspect.inspect.item.write: {}
 #

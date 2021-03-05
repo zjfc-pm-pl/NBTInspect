@@ -196,14 +196,14 @@ class NBTInspect extends PluginBase implements Listener, API{
 			case 'help':
 				$cmdl[] = 'help' . TF::ITALIC . TF::GRAY . ' (Display NBTInspect plugin command usage)';
 
-				if ($p->hasPermission('nbtinspect.cmd.item')) $cmdl[] = 'item [Inventory slot] [Entity ID]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
+				if ($p->hasPermission('nbtinspect.inspect.item.read')) $cmdl[] = 'item [Inventory slot] [Entity ID]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an item)';
 
-				if ($p->hasPermission('nbtinspect.cmd.entity')) $cmdl[] = 'entity [Entity ID|Play
+				if ($p->hasPermission('nbtinspect.inspect.entity.read')) $cmdl[] = 'entity [Entity ID|Play
 				er name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of an entity or the player data of a player)';
 
-				if ($p->hasPermission('nbtinspect.cmd.level')) $cmdl[] = 'level [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a level by the level folder name)';
+				if ($p->hasPermission('nbtinspect.inspect.level.read')) $cmdl[] = 'level [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a level by the level folder name)';
 
-				if ($p->hasPermission('nbtinspect.cmd.tile')) $cmdl[] = 'tile [xyz] [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a tile by XYZ)';
+				if ($p->hasPermission('nbtinspect.inspect.tile.read')) $cmdl[] = 'tile [xyz] [Level folder name]' . TF::ITALIC . TF::GRAY . ' (Inspect the NBT data of a tile by XYZ)';
 
 				$p->sendMessage(TF::BOLD . TF::GOLD . 'Available arguments for commands "/nbtinspect":' . ($glue = TF::RESET . "\n" . TF::WHITE . ' - ' . TF::YELLOW) . implode($glue, $cmdl ?? []));
 				break;
@@ -213,7 +213,7 @@ class NBTInspect extends PluginBase implements Listener, API{
                     $p->sendMessage(TF::BOLD . TF::RED . 'Sorry, you can only use this subcommands in-game unless a suitable UI type is registered!');
 					break;
                 }
-				if (!$p->hasPermission('nbtinspect.cmd.item')) return false;
+				if (!$p->hasPermission('nbtinspect.inspect.item.read')) return false;
 				if (!isset($args[2])) {
 				   if ($p instanceof InventoryHolder) $inv = $p->getInventory();
 				   else {
