@@ -43,7 +43,7 @@ abstract class BaseForm {
 		$ui->getSession()->getSessionOwner()->sendForm($this->form());
 	}
 
-	public function preReact(Player $p, $data = null) : void {
+	final public function preReact(Player $p, $data = null) : void {
 		$this->resetForm();
 		$this->react($data);
 	}
