@@ -293,6 +293,9 @@ class NBTInspect extends PluginBase, API{
 		return true;
 	}
 	
+	/**
+	 * @internal
+	 */
 	public function addHotbar(BaseHotbar $hotbar) : bool {
 		if (in_array($hotbar, $this->hotbar, true)) return false;
 		$this->hotbar[] = $hotbar;
@@ -301,6 +304,7 @@ class NBTInspect extends PluginBase, API{
 	
 	/**
 	 * @return BaseHotbar[]
+	 * @internal
 	 */
 	public function getHotbars() : array {
 		foreach ($this->hotbar as $i => $hotbar) if ($hotbar->isClosed()) unset($this->hotbar[$i]);
