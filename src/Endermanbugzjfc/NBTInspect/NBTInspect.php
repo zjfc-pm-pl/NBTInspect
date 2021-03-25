@@ -47,7 +47,8 @@ use pocketmine\event\{
 use Endermanbugzjfc\NBTInspect\{
 	sessions\InspectSession,
 	uis\UIInterface,
-	uis\FormUI
+	uis\FormUI,
+	uis\hotbar\BaseHotbar
 };
 
 use function assert;
@@ -55,7 +56,7 @@ use function is_a;
 use function strtolower;
 
 
-class NBTInspect extends PluginBase implements Listener, API{
+class NBTInspect extends PluginBase, API{
 
 	public const UI_DEFAULT = FormUI::class;
 	
@@ -82,7 +83,7 @@ class NBTInspect extends PluginBase implements Listener, API{
 
 	public function onEnable() : void {
 		// if(!InvMenuHandler::isRegistered()) InvMenuHandler::register($this);
-		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener, $this);
 		$this->getLogger()->warning('This plugin should only be use as a developer tool, there is a risk of corrupting the data or break your server by modifying the data arbitrarily! (Consider giving developer read-only permission if you decide to put this on production server)');
 	}
 
@@ -290,5 +291,19 @@ class NBTInspect extends PluginBase implements Listener, API{
 			    break;
 		}
 		return true;
+	}
+	
+	public function addHotbar(BaseHotbar $hotbar) : bool {
+		if (in_array($hotbar, $this->hotbar, true)) return false;
+		$this->hotbar[] = $hotbar;
+		return true;
+	}
+	
+	/**
+	 * @return BaseHotbar[]
+	 */
+	public function getHotbars() : array {
+		foreach ($this->hotbar as $i => $hotbar) if ($hotbar->isClosed()) unset($this->hotbar[$i]);
+		return $this->hotbar;
 	}
 }

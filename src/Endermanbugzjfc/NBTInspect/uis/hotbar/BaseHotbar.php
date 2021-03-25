@@ -76,6 +76,7 @@ abstract class BaseHotbar {
 
     /**
      * @param PlayerInteractEvent|InventoryTransactionEvent $ev
+     * @internal
      */
     final public function preReact($ev) : void {
         $this->react($ev);
@@ -89,5 +90,18 @@ abstract class BaseHotbar {
 
     protected function resetInventory() : void {
         $this->getInventory()->setContents($this->origininv, false);
+    }
+    
+    protected $closed = false;
+    
+    public function close() : bool {
+        if ($this->closed) return false;
+        // TODO: Put back original items to player's inventory
+        $this->closed = true;
+        return true;
+    }
+    
+    public function isClosed() : bool {
+        return $this->closed;
     }
 }
