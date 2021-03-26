@@ -71,7 +71,7 @@ abstract class BaseHotbar {
         $item = Item::get(Item::INVISIBLEBEDROCK);
         $item->setCustomName(TF::GRAY . '(Click / drop to exit edit mode)');
         $item->setNamedTagEntry(new CompoundTag('NBTInspect', [new ByteTag('action', self::ACTION_EXIT)]));
-        for ($slot=0; $slot <= 27; $slot++) $this->getInventory()->setItem($slot, $item, false);
+        for ($slot=9; $slot < 36; $slot++) $this->getInventory()->setItem($slot, $item, false);
     }
 
     /**
